@@ -4,7 +4,7 @@ Entry point da aplicação FastAPI
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.api.v1 import auth
+from app.api.v1 import auth, licitacoes
 import logging
 
 # Configurar logging
@@ -39,6 +39,7 @@ app.add_middleware(
 
 # Incluir routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(licitacoes.router, prefix="/api/v1")
 
 # Health check
 @app.get("/")
