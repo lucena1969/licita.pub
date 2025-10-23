@@ -1,28 +1,29 @@
 /*
 ====================================================================================================
-LICITA.PUB - CRIAÇÃO DAS TABELAS (VERSÃO SIMPLIFICADA)
+LICITA.PUB - CRIAÇÃO DAS TABELAS (VERSÃO SIMPLIFICADA PARA XAMPP)
 ====================================================================================================
-Descrição: Script para criar todas as tabelas do sistema
-Autor: Licita.pub
-Data: 2025-01-17
-Versão: 1.0 (Simplificada - sem queries de verificação)
-
-INSTRUÇÕES PARA phpMyAdmin:
-1. Execute ANTES o script 01_criar_banco.sql
-2. Abra o phpMyAdmin
-3. Selecione o banco "licitapub" na sidebar esquerda
-4. Clique em "SQL" no menu superior
-5. Cole TODO este script
-6. Clique em "Executar"
+INSTRUÇÕES:
+1. Abra o phpMyAdmin (http://localhost/phpmyadmin)
+2. Clique no banco "licitapub" na sidebar esquerda
+3. Clique em "SQL" no menu superior
+4. Cole TODO este script
+5. Clique em "Executar"
 ====================================================================================================
 */
 
 USE licitapub;
 
--- ====================================================================================================
+-- Remove tabelas existentes (cuidado: apaga dados!)
+DROP TABLE IF EXISTS favoritos;
+DROP TABLE IF EXISTS alertas;
+DROP TABLE IF EXISTS historico_buscas;
+DROP TABLE IF EXISTS itens_licitacao;
+DROP TABLE IF EXISTS licitacoes;
+DROP TABLE IF EXISTS logs_sincronizacao;
+DROP TABLE IF EXISTS usuarios;
+
 -- TABELA: usuarios
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS usuarios (
+CREATE TABLE usuarios (
     id CHAR(36) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     senha VARCHAR(255) NOT NULL,
@@ -38,16 +39,11 @@ CREATE TABLE IF NOT EXISTS usuarios (
     plano ENUM('GRATUITO', 'BASICO', 'INTERMEDIARIO', 'PREMIUM') NOT NULL DEFAULT 'GRATUITO',
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_email (email),
-    INDEX idx_cpf_cnpj (cpf_cnpj),
-    INDEX idx_ativo (ativo)
+    INDEX idx_email (email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: licitacoes
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS licitacoes (
+CREATE TABLE licitacoes (
     id CHAR(36) PRIMARY KEY,
     pncp_id VARCHAR(100) NOT NULL UNIQUE,
     orgao_id VARCHAR(50) NOT NULL,
@@ -67,26 +63,14 @@ CREATE TABLE IF NOT EXISTS licitacoes (
     cnpj_orgao VARCHAR(18) NOT NULL,
     sincronizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX idx_pncp_id (pncp_id),
     INDEX idx_uf (uf),
     INDEX idx_municipio (municipio),
-    INDEX idx_uf_municipio (uf, municipio),
     INDEX idx_modalidade (modalidade),
-    INDEX idx_situacao (situacao),
-    INDEX idx_modalidade_situacao (modalidade, situacao),
-    INDEX idx_data_abertura (data_abertura),
-    INDEX idx_data_publicacao (data_publicacao),
-    INDEX idx_valor (valor_estimado),
-    INDEX idx_cnpj_orgao (cnpj_orgao),
-    FULLTEXT INDEX idx_objeto (objeto),
-    FULLTEXT INDEX idx_nome_orgao (nome_orgao)
+    INDEX idx_situacao (situacao)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: itens_licitacao
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS itens_licitacao (
+CREATE TABLE itens_licitacao (
     id CHAR(36) PRIMARY KEY,
     licitacao_id CHAR(36) NOT NULL,
     numero_item INT NOT NULL,
@@ -96,31 +80,22 @@ CREATE TABLE IF NOT EXISTS itens_licitacao (
     valor_unitario DECIMAL(15, 2) NULL,
     valor_total DECIMAL(15, 2) NULL,
     FOREIGN KEY (licitacao_id) REFERENCES licitacoes(id) ON DELETE CASCADE,
-    INDEX idx_licitacao_id (licitacao_id),
-    INDEX idx_numero_item (numero_item)
+    INDEX idx_licitacao_id (licitacao_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: favoritos
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS favoritos (
+CREATE TABLE favoritos (
     id CHAR(36) PRIMARY KEY,
     usuario_id CHAR(36) NOT NULL,
     licitacao_id CHAR(36) NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
     FOREIGN KEY (licitacao_id) REFERENCES licitacoes(id) ON DELETE CASCADE,
-    UNIQUE KEY uq_usuario_licitacao (usuario_id, licitacao_id),
-    INDEX idx_usuario_id (usuario_id),
-    INDEX idx_licitacao_id (licitacao_id)
+    UNIQUE KEY uq_usuario_licitacao (usuario_id, licitacao_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: alertas
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS alertas (
+CREATE TABLE alertas (
     id CHAR(36) PRIMARY KEY,
     usuario_id CHAR(36) NOT NULL,
     nome VARCHAR(255) NOT NULL,
@@ -130,32 +105,21 @@ CREATE TABLE IF NOT EXISTS alertas (
     ultimo_envio DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    INDEX idx_usuario_id (usuario_id),
-    INDEX idx_ativo (ativo),
-    INDEX idx_frequencia (frequencia)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: historico_buscas
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS historico_buscas (
+CREATE TABLE historico_buscas (
     id CHAR(36) PRIMARY KEY,
     usuario_id CHAR(36) NOT NULL,
     termo_busca VARCHAR(500) NOT NULL,
     filtros JSON NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    INDEX idx_usuario_id (usuario_id),
-    INDEX idx_created_at (created_at)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
 -- TABELA: logs_sincronizacao
--- ====================================================================================================
-CREATE TABLE IF NOT EXISTS logs_sincronizacao (
+CREATE TABLE logs_sincronizacao (
     id CHAR(36) PRIMARY KEY,
     fonte VARCHAR(50) NOT NULL,
     tipo VARCHAR(50) NOT NULL,
@@ -167,16 +131,8 @@ CREATE TABLE IF NOT EXISTS logs_sincronizacao (
     detalhes JSON NULL,
     iniciado DATETIME NOT NULL,
     finalizado DATETIME NOT NULL,
-    duracao INT NULL,
-    INDEX idx_fonte (fonte),
-    INDEX idx_tipo (tipo),
-    INDEX idx_status (status),
-    INDEX idx_iniciado (iniciado)
+    duracao INT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
--- ====================================================================================================
--- FIM DO SCRIPT
--- ====================================================================================================
--- Tabelas criadas com sucesso!
--- Para verificar, execute: SHOW TABLES;
+SELECT '✓ 7 tabelas criadas com sucesso!' AS Status;
+SHOW TABLES;
