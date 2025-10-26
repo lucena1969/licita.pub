@@ -17,6 +17,7 @@
 
 // Carregar autoload
 $rootDir = dirname(__DIR__);
+require_once $rootDir . '/src/Config/Config.php';
 require_once $rootDir . '/src/Config/Database.php';
 require_once $rootDir . '/src/Models/Licitacao.php';
 require_once $rootDir . '/src/Models/Orgao.php';
@@ -24,7 +25,11 @@ require_once $rootDir . '/src/Repositories/LicitacaoRepository.php';
 require_once $rootDir . '/src/Repositories/OrgaoRepository.php';
 require_once $rootDir . '/src/Services/PNCPService.php';
 
+use App\Config\Config;
 use App\Services\PNCPService;
+
+// Carregar variáveis de ambiente do .env
+Config::load();
 
 // Cores para output
 class Color {
