@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Licita.pub</title>
+    <meta name="description" content="Acesse sua conta no Licita.pub e consulte licitações públicas do Brasil.">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <a href="/" class="back-link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </svg>
+            Voltar para home
+        </a>
+
+        <div class="auth-logo">
+            <h1>Licita.pub</h1>
+            <p>Entre na sua conta</p>
+        </div>
+
+        <!-- Alertas -->
+        <div id="alert-container"></div>
+
+        <!-- Formulário de login -->
+        <form id="login-form">
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email">
+                    Email
+                    <span class="required">*</span>
+                </label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="seu@email.com"
+                    required
+                    autocomplete="email"
+                    autofocus
+                >
+            </div>
+
+            <!-- Senha -->
+            <div class="form-group">
+                <label for="senha">
+                    Senha
+                    <span class="required">*</span>
+                </label>
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Sua senha"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <!-- Link esqueceu senha -->
+            <div style="text-align: right; margin-bottom: 20px;">
+                <a href="#" style="font-size: 14px; color: #2563eb; text-decoration: none;">
+                    Esqueceu sua senha?
+                </a>
+            </div>
+
+            <!-- Botão de login -->
+            <button type="submit" class="btn btn-primary" id="submit-btn">
+                Entrar
+            </button>
+        </form>
+
+        <!-- Footer -->
+        <div class="auth-footer">
+            Não tem uma conta?
+            <a href="/cadastro.html">Criar conta gratuita</a>
+        </div>
+
+        <div class="divider">
+            <span>ou</span>
+        </div>
+
+        <div class="auth-footer">
+            <a href="/">Continuar sem login</a>
+            <br>
+            <small style="color: #9ca3af; margin-top: 8px; display: block;">
+                Limite de 5 consultas por dia
+            </small>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/js/validator.js"></script>
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script>
+        // Elementos
+        const form = document.getElementById('login-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const alertContainer = document.getElementById('alert-container');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
+
+        // Função para mostrar alertas
+        function showAlert(messages, type = 'error') {
+            const alertClass = type === 'error' ? 'alert-error' : 'alert-success';
+
+            let messageList = '';
+            if (Array.isArray(messages)) {
+                messageList = '<ul>' + messages.map(msg => `<li>${msg}</li>`).join('') + '</ul>';
+            } else {
+                messageList = messages;
+            }
+
+            alertContainer.innerHTML = `
+                <div class="alert ${alertClass}">
+                    ${messageList}
+                </div>
+            `;
+
+            // Scroll para o topo
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Função para desabilitar/habilitar botão
+        function setLoading(isLoading) {
+            submitBtn.disabled = isLoading;
+            if (isLoading) {
+                submitBtn.innerHTML = '<div class="spinner"></div> Entrando...';
+            } else {
+                submitBtn.innerHTML = 'Entrar';
+            }
+        }
+
+        // Verificar se já está autenticado
+        if (auth.isAuthenticated()) {
+            window.location.href = '/consultas.html';
+        }
+
+        // Submeter formulário
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            alertContainer.innerHTML = '';
+
+            // Obter dados do formulário
+            const email = emailInput.value.trim();
+            const senha = senhaInput.value;
+
+            // Validação básica
+            if (!email || !senha) {
+                showAlert(['Email e senha são obrigatórios'], 'error');
+                return;
+            }
+
+            // Validar email
+            const emailValidation = Validator.validateEmail(email);
+            if (!emailValidation.valid) {
+                showAlert(emailValidation.errors, 'error');
+                return;
+            }
+
+            // Enviar para API
+            setLoading(true);
+
+            try {
+                const response = await auth.login(email, senha);
+
+                if (response.success && response.usuario) {
+                    // Login bem-sucedido
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+
+                    // Redirecionar após 500ms
+                    setTimeout(() => {
+                        window.location.href = '/consultas.html';
+                    }, 500);
+                } else {
+                    // Erro no login
+                    const errors = response.data?.errors || ['Email ou senha inválidos'];
+                    showAlert(errors, 'error');
+                    setLoading(false);
+
+                    // Limpar senha
+                    senhaInput.value = '';
+                    senhaInput.focus();
+                }
+            } catch (error) {
+                console.error('Erro no login:', error);
+                showAlert(['Erro ao conectar com o servidor. Tente novamente.'], 'error');
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -90,6 +90,10 @@ class UsuarioRepository
             telefone = :telefone,
             cpf_cnpj = :cpf_cnpj,
             email_verificado = :email_verificado,
+            token_verificacao = :token_verificacao,
+            token_verificacao_expira = :token_verificacao_expira,
+            token_reset_senha = :token_reset_senha,
+            token_reset_senha_expira = :token_reset_senha_expira,
             ativo = :ativo,
             plano = :plano,
             updated_at = CURRENT_TIMESTAMP
@@ -104,6 +108,10 @@ class UsuarioRepository
             ':telefone' => $usuario->telefone,
             ':cpf_cnpj' => $usuario->cpf_cnpj,
             ':email_verificado' => $usuario->email_verificado ? 1 : 0,
+            ':token_verificacao' => $usuario->token_verificacao,
+            ':token_verificacao_expira' => $usuario->token_verificacao_expira,
+            ':token_reset_senha' => $usuario->token_reset_senha,
+            ':token_reset_senha_expira' => $usuario->token_reset_senha_expira,
             ':ativo' => $usuario->ativo ? 1 : 0,
             ':plano' => $usuario->plano,
         ]);
@@ -121,6 +129,20 @@ class UsuarioRepository
             ':id' => $userId,
             ':senha' => $hashedPassword,
         ]);
+    }
+
+    /**
+     * Buscar usuário por token de reset de senha
+     */
+    public function findByResetToken(string $token): ?Usuario
+    {
+        $sql = "SELECT * FROM usuarios WHERE token_reset_senha = :token AND token_reset_senha_expira > NOW() LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':token' => $token]);
+
+        $data = $stmt->fetch();
+
+        return $data ? Usuario::fromArray($data) : null;
     }
 
     /**

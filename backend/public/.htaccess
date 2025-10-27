@@ -1,14 +1,26 @@
 # Licita.pub - Apache Configuration
 
+# Habilitar mod_rewrite
+RewriteEngine On
+
 # Força HTTPS (descomente quando SSL estiver ativo)
-# RewriteEngine On
 # RewriteCond %{HTTPS} off
 # RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Redirecionar www para não-www (ou vice-versa)
-# RewriteEngine On
 # RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
 # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+
+# Permitir que arquivos e diretórios existentes sejam acessados
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Garantir Content-Type para JSON
+AddType application/json .json
+
+# Permitir headers de autorização
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
 
 # PHP Settings
 php_value upload_max_filesize 10M
@@ -47,6 +59,8 @@ ErrorDocument 500 /500.html
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
+    # Permitir que middlewares PHP definam headers CORS
+    Header always set Access-Control-Allow-Credentials "true"
 </IfModule>
 
 # Bloquear acesso a arquivos sensíveis
