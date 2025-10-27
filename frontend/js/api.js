@@ -17,16 +17,16 @@ class ApiService {
 
         // Produção
         if (hostname === 'licita.pub' || hostname === 'www.licita.pub') {
-            return 'https://licita.pub/api';
+            return 'https://licita.pub/backend/api';
         }
 
         // Desenvolvimento local
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost/api';
+            return 'http://localhost/backend/api';
         }
 
         // Fallback
-        return '/api';
+        return '/backend/api';
     }
 
     /**
