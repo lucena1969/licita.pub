@@ -69,6 +69,7 @@
                 </div>
                 <div class="hidden md:flex space-x-6">
                     <a href="#sobre" class="text-gray-600 hover:text-blue-600 transition">Sobre</a>
+                    <a href="#planos" class="text-gray-600 hover:text-blue-600 transition">Planos</a>
                     <a href="#funcionalidades" class="text-gray-600 hover:text-blue-600 transition">Funcionalidades</a>
                     <a href="#contato" class="text-gray-600 hover:text-blue-600 transition">Contato</a>
                 </div>
@@ -92,13 +93,16 @@
                 Conectando fornecedores a oportunidades de negócios com o governo brasileiro de forma simples, transparente e eficiente.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#sobre" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
-                    Saiba Mais
+                <a href="/frontend/cadastro.html" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition shadow-lg">
+                    Começar Grátis - 10 consultas/dia
                 </a>
-                <a href="#contato" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
-                    Entre em Contato
+                <a href="/frontend/login.html" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
+                    Já tenho conta
                 </a>
             </div>
+            <p class="mt-6 text-sm text-gray-200">
+                ✅ Sem cartão de crédito | ✅ 10 consultas gratuitas por dia | ✅ Cadastro em 1 minuto
+            </p>
         </div>
     </section>
 
@@ -163,8 +167,152 @@
         </div>
     </section>
 
+    <!-- Planos Section -->
+    <section id="planos" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">Planos e Preços</h2>
+                <p class="text-xl text-gray-600">Escolha o plano ideal para o seu negócio</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Plano Anônimo -->
+                <div class="bg-gray-50 p-8 rounded-xl border-2 border-gray-200">
+                    <div class="text-center mb-6">
+                        <div class="text-4xl mb-4">🔓</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">Anônimo</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">Grátis</div>
+                        <p class="text-gray-600">Sem cadastro</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700"><strong>5 consultas detalhadas</strong> por dia</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Listagem completa de licitações</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Busca simples por UF e município</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-gray-400 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-400">Sem favoritos</span>
+                        </li>
+                    </ul>
+                    <a href="/api/licitacoes/listar.php" class="block w-full text-center bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+                        Explorar Agora
+                    </a>
+                </div>
+
+                <!-- Plano FREE -->
+                <div class="bg-blue-50 p-8 rounded-xl border-2 border-blue-500 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        Mais Popular
+                    </div>
+                    <div class="text-center mb-6">
+                        <div class="text-4xl mb-4">⭐</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">FREE</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">Grátis</div>
+                        <p class="text-gray-600">Com cadastro</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700"><strong>10 consultas detalhadas</strong> por dia</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Tudo do plano Anônimo +</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Filtros avançados</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Salvar favoritos (em breve)</span>
+                        </li>
+                    </ul>
+                    <a href="/frontend/cadastro.html" class="block w-full text-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Cadastrar Grátis
+                    </a>
+                </div>
+
+                <!-- Plano PREMIUM -->
+                <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-8 rounded-xl border-2 border-purple-300">
+                    <div class="text-center mb-6">
+                        <div class="text-4xl mb-4">👑</div>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">PREMIUM</h3>
+                        <div class="text-3xl font-bold text-gray-900 mb-2">Em breve</div>
+                        <p class="text-gray-600">Recursos ilimitados</p>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700"><strong>Consultas ilimitadas</strong></span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Alertas personalizados por email</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Exportação Excel/PDF</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">API de integração</span>
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-5 h-5 text-green-500 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            <span class="text-gray-700">Suporte prioritário</span>
+                        </li>
+                    </ul>
+                    <button disabled class="block w-full text-center bg-gray-300 text-gray-500 px-6 py-3 rounded-lg font-semibold cursor-not-allowed">
+                        Em Breve
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-gray-600">
+                    💡 <strong>Dica:</strong> Todos os planos têm reset automático após 24 horas da primeira consulta do dia
+                </p>
+            </div>
+        </div>
+    </section>
+
     <!-- Funcionalidades Section -->
-    <section id="funcionalidades" class="py-20 bg-white">
+    <section id="funcionalidades" class="py-20 bg-gray-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-4xl font-bold text-gray-900 mb-4">Funcionalidades</h2>
@@ -227,25 +375,45 @@
     <section class="py-20 bg-blue-50">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div class="bg-white p-8 rounded-xl shadow-md">
-                <div class="text-5xl mb-4">🚧</div>
-                <h2 class="text-3xl font-bold text-gray-900 mb-4">Plataforma em Desenvolvimento</h2>
+                <div class="text-5xl mb-4">🚀</div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-4">Sistema em Fase Beta</h2>
                 <p class="text-lg text-gray-600 mb-6">
-                    Estamos trabalhando para trazer a melhor experiência em licitações públicas do Brasil.
-                    A plataforma completa estará disponível em breve!
+                    Backend implementado com sucesso! Estamos finalizando o frontend para oferecer
+                    a melhor experiência em licitações públicas do Brasil.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <div class="flex items-center justify-center space-x-2 text-green-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="flex flex-col items-center justify-center space-y-2 text-green-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Backend em desenvolvimento</span>
+                        <span class="text-sm font-semibold">Backend Completo</span>
                     </div>
-                    <div class="flex items-center justify-center space-x-2 text-green-600">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <div class="flex flex-col items-center justify-center space-y-2 text-green-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        <span>Integração PNCP ativa</span>
+                        <span class="text-sm font-semibold">API Funcionando</span>
                     </div>
+                    <div class="flex flex-col items-center justify-center space-y-2 text-green-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm font-semibold">Sistema Freemium</span>
+                    </div>
+                    <div class="flex flex-col items-center justify-center space-y-2 text-green-600">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="text-sm font-semibold">Integração PNCP</span>
+                    </div>
+                </div>
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/frontend/cadastro.html" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+                        Criar Conta Grátis
+                    </a>
+                    <a href="#planos" class="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition">
+                        Ver Planos
+                    </a>
                 </div>
             </div>
         </div>
@@ -297,8 +465,9 @@
                 <div>
                     <h4 class="text-white font-semibold mb-4">Informações</h4>
                     <ul class="space-y-2 text-sm">
-                        <li>Status: Em Desenvolvimento</li>
-                        <li>Versão: 1.0.0 (Beta)</li>
+                        <li>Status: Fase Beta</li>
+                        <li>Versão: 2.0.0 (Freemium)</li>
+                        <li>Backend: ✅ Completo</li>
                         <li>Última atualização: <?php echo date('d/m/Y'); ?></li>
                     </ul>
                 </div>
