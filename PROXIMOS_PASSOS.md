@@ -1,8 +1,8 @@
 # 🚀 PRÓXIMOS PASSOS - LICITA.PUB
 
-**Data:** 26/10/2025
+**Data:** 28/10/2025
 **Status:** Backend de sincronização funcionando | Frontend freemium em desenvolvimento
-**Última atualização:** Após configuração do cron job PNCP
+**Última atualização:** UPSERT implementado (aguardando deploy em produção)
 
 ---
 
@@ -15,6 +15,9 @@
 - ✅ Logs funcionando (`/home/u590097272/logs/pncp_sync.log`)
 - ✅ Arquivo `.env` configurado
 - ✅ Cron job ativo na Hostinger
+- ✅ **UPSERT implementado** (evita duplicatas, atualiza todos os campos)
+  - ⚠️ Aguardando deploy em produção
+  - 📝 Ver: `backend/database/GUIA_APLICAR_UPSERT.md`
 
 ### Banco de Dados
 - ✅ Tabela `licitacoes` (populada)
@@ -626,6 +629,54 @@ function loginComGoogle() {
 
 ---
 
+## 🔄 ATUALIZAÇÃO IMPORTANTE: UPSERT IMPLEMENTADO (28/10/2025)
+
+### 📌 O QUE FOI FEITO
+
+Implementamos **UPSERT** na sincronização PNCP para resolver dois problemas:
+1. ❌ **Problema:** Campos não eram atualizados (apenas 7 de 14 campos)
+2. ❌ **Problema:** Possibilidade de duplicatas se não houvesse índice único
+
+### ✅ SOLUÇÃO IMPLEMENTADA
+
+**Arquivos modificados:**
+- ✅ [LicitacaoRepository.php](backend/src/Repositories/LicitacaoRepository.php) - Adicionado método `upsert()`
+- ✅ [PNCPService.php](backend/src/Services/PNCPService.php) - Agora usa `upsert()` ao invés de `create/update`
+
+**Arquivos criados:**
+- ✅ [004_adicionar_unique_pncp_id.sql](backend/database/migrations/004_adicionar_unique_pncp_id.sql) - Migration
+- ✅ [verificar_duplicatas.php](backend/database/verificar_duplicatas.php) - Script de verificação
+- ✅ [limpar_duplicatas.php](backend/database/limpar_duplicatas.php) - Script de limpeza
+- ✅ [GUIA_APLICAR_UPSERT.md](backend/database/GUIA_APLICAR_UPSERT.md) - **Guia completo de deploy**
+
+### 🚀 COMO APLICAR EM PRODUÇÃO
+
+**Siga o guia passo a passo:**
+```bash
+# Ver guia completo
+cat backend/database/GUIA_APLICAR_UPSERT.md
+```
+
+**Resumo rápido:**
+1. Fazer backup do banco
+2. Verificar duplicatas: `php backend/database/verificar_duplicatas.php`
+3. Limpar duplicatas (se houver): `php backend/database/limpar_duplicatas.php`
+4. Executar migration 004: `mysql ... < 004_adicionar_unique_pncp_id.sql`
+5. Fazer upload dos arquivos PHP atualizados
+6. Testar: `php backend/cron/sincronizar_pncp.php --ultimos-dias=1`
+
+### 📊 BENEFÍCIOS APÓS APLICAR
+
+| Aspecto | Antes | Depois |
+|---------|-------|--------|
+| **Campos atualizados** | 7/14 campos | ✅ 14/14 campos (todos) |
+| **Queries por licitação** | 2-3 queries | ✅ 1 query |
+| **Duplicatas** | Possível | ✅ Impossível (índice UNIQUE) |
+| **Correções PNCP** | Não refletiam | ✅ Sempre atualizadas |
+| **Performance** | Lenta | ✅ Mais rápida |
+
+---
+
 ## 📞 CONTATOS E SUPORTE
 
 - **Email:** contato@licita.pub
@@ -658,8 +709,24 @@ Ao começar a próxima sessão:
 
 ---
 
-**Última atualização:** 26/10/2025
-**Próxima revisão:** Após conclusão da Fase 1
+---
+
+## 📝 HISTÓRICO DE ATUALIZAÇÕES
+
+**28/10/2025 - UPSERT Implementado**
+- ✅ Método `upsert()` criado no LicitacaoRepository
+- ✅ PNCPService atualizado para usar upsert
+- ✅ Migration 004 criada (índice UNIQUE em pncp_id)
+- ✅ Scripts de verificação e limpeza de duplicatas
+- ✅ Guia completo de deploy em produção
+- ⚠️ Aguardando aplicação em produção
+
+**26/10/2025 - Configuração inicial**
+- ✅ Cron job PNCP configurado
+- ✅ Sincronização funcionando
+- ✅ Migration 003 criada
+
+**Próxima revisão:** Após aplicar UPSERT em produção e conclusão da Fase 1
 
 ---
 

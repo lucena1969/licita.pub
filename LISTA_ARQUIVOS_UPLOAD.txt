@@ -1,0 +1,101 @@
+═══════════════════════════════════════════════════════════════
+📤 LISTA DE ARQUIVOS PARA UPLOAD NO SERVIDOR
+═══════════════════════════════════════════════════════════════
+
+🎯 DESTINO NO SERVIDOR:
+/home/u590097272/domains/licita.pub/public_html/backend/
+
+═══════════════════════════════════════════════════════════════
+
+📁 ESTRUTURA COMPLETA PARA ENVIAR:
+
+backend/
+│
+├── .env                                    ⚠️ IMPORTANTE! Configurações do banco
+├── .htaccess                               Configuração Apache
+│
+├── src/
+│   ├── Config/
+│   │   ├── Config.php                     Carrega variáveis de ambiente
+│   │   └── Database.php                   Conexão MySQL
+│   │
+│   ├── Models/
+│   │   ├── Licitacao.php                  Model de Licitação
+│   │   └── Orgao.php                      Model de Órgão
+│   │
+│   ├── Repositories/
+│   │   ├── LicitacaoRepository.php        ✅ COM UPSERT
+│   │   └── OrgaoRepository.php            Repositório de Órgãos
+│   │
+│   └── Services/
+│       └── PNCPService.php                ✅ USA UPSERT
+│
+├── public/
+│   ├── .htaccess                          Configuração Apache
+│   ├── index.php                          Landing page (HTML)
+│   ├── admin_duplicatas.php               🌐 Menu duplicatas
+│   ├── verificar_duplicatas_web.php       🌐 Verificar duplicatas
+│   ├── limpar_duplicatas_web.php          🌐 Limpar duplicatas
+│   ├── test_conexao.php                   Teste de conexão
+│   ├── teste_simples.php                  Teste simples
+│   └── info.php                           PHP Info
+│
+├── cron/
+│   └── sincronizar_pncp.php               Script de sincronização PNCP
+│
+├── database/
+│   ├── migrations/
+│   │   ├── 001_criar_tabelas.sql
+│   │   ├── 002_adicionar_campos.sql
+│   │   ├── 003_atualizar_usuarios_limites.sql
+│   │   └── 004_adicionar_unique_pncp_id.sql  ✅ MIGRATION UPSERT
+│   │
+│   ├── verificar_duplicatas.php           Script CLI verificação
+│   ├── limpar_duplicatas.php              Script CLI limpeza
+│   ├── GUIA_APLICAR_UPSERT.md            Documentação
+│   └── SCRIPTS_WEB.md                     Documentação scripts web
+│
+└── (outros arquivos conforme necessário)
+
+═══════════════════════════════════════════════════════════════
+
+⚠️ ARQUIVOS CRÍTICOS (NÃO ESQUEÇA!):
+
+1. backend/.env                             → Credenciais do banco
+2. backend/src/Config/Config.php            → Carrega .env
+3. backend/src/Config/Database.php          → Conexão MySQL
+4. backend/src/Repositories/LicitacaoRepository.php → Método upsert()
+5. backend/src/Services/PNCPService.php     → Usa upsert()
+6. backend/database/migrations/004_*.sql    → Migration UPSERT
+
+═══════════════════════════════════════════════════════════════
+
+✅ DEPOIS DO UPLOAD, VERIFICAR:
+
+1. Acesse: https://licita.pub/teste_simples.php
+   → Deve mostrar ✅ para todos os arquivos
+
+2. Acesse: https://licita.pub/verificar_duplicatas_web.php
+   → Deve funcionar sem erro 500
+
+3. Acesse: https://licita.pub/admin_duplicatas.php
+   → Deve mostrar menu
+
+═══════════════════════════════════════════════════════════════
+
+🔧 MÉTODO RECOMENDADO:
+
+1. Compacte a pasta inteira "backend/" em um ZIP
+2. Faça upload do ZIP via cPanel File Manager
+3. Extraia dentro de public_html/
+4. Verifique se .env foi incluído
+5. Ajuste permissões (755 para pastas, 644 para arquivos)
+
+═══════════════════════════════════════════════════════════════
+
+📞 EM CASO DE DÚVIDA:
+
+- Veja: GUIA_UPLOAD_SERVIDOR.md
+- Ou pergunte no chat
+
+═══════════════════════════════════════════════════════════════

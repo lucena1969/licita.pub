@@ -1,0 +1,155 @@
+═══════════════════════════════════════════════════════════════
+🔄 GUIA: RESET COMPLETO E UPLOAD CORRETO
+═══════════════════════════════════════════════════════════════
+
+📅 Data: 28/10/2025
+🎯 Objetivo: Deletar backend do servidor e refazer upload corretamente
+
+═══════════════════════════════════════════════════════════════
+
+🗑️ PASSO 1: DELETAR PASTA BACKEND DO SERVIDOR
+
+Via cPanel File Manager:
+1. Acesse: https://hpanel.hostinger.com
+2. Clique em "File Manager"
+3. Navegue até: /home/u590097272/domains/licita.pub/public_html/
+4. Selecione a pasta "backend"
+5. Clique em "Delete"
+6. Confirme a exclusão
+
+Via SSH (se tiver acesso):
+```bash
+ssh u590097272@licita.pub
+cd /home/u590097272/domains/licita.pub/public_html/
+rm -rf backend/
+```
+
+═══════════════════════════════════════════════════════════════
+
+📤 PASSO 2: PREPARAR ARQUIVOS PARA UPLOAD
+
+No seu computador local (projeto):
+
+1. Verifique se o arquivo .env existe em: backend/.env
+2. Verifique se tem todas as pastas:
+   - backend/src/
+   - backend/public/
+   - backend/cron/
+   - backend/database/
+
+3. Compacte a pasta backend em um ZIP:
+   - Clique com botão direito na pasta "backend"
+   - Selecione "Compactar" ou "Send to > Compressed folder"
+   - Nome do arquivo: backend.zip
+
+⚠️ IMPORTANTE: Certifique-se que o .env está DENTRO do ZIP!
+
+═══════════════════════════════════════════════════════════════
+
+📤 PASSO 3: FAZER UPLOAD DO BACKEND
+
+Via cPanel File Manager:
+1. Volte para: /home/u590097272/domains/licita.pub/public_html/
+2. Clique em "Upload"
+3. Selecione o arquivo "backend.zip"
+4. Aguarde upload completar (pode demorar alguns minutos)
+5. Após concluir, clique com botão direito em "backend.zip"
+6. Selecione "Extract"
+7. Aguarde extração completar
+8. Delete o arquivo "backend.zip"
+
+═══════════════════════════════════════════════════════════════
+
+✅ PASSO 4: VERIFICAR ESTRUTURA
+
+A estrutura deve estar assim:
+
+public_html/
+└── backend/
+    ├── .env                    ⚠️ IMPORTANTE!
+    ├── .htaccess
+    ├── src/
+    │   ├── Config/
+    │   │   ├── Config.php
+    │   │   └── Database.php
+    │   ├── Models/
+    │   ├── Repositories/
+    │   └── Services/
+    ├── public/
+    │   ├── index.php
+    │   ├── teste_basico.php   ⚠️ NOVO ARQUIVO
+    │   ├── admin_duplicatas.php
+    │   ├── verificar_duplicatas_web.php
+    │   └── limpar_duplicatas_web.php
+    ├── cron/
+    └── database/
+
+═══════════════════════════════════════════════════════════════
+
+🔍 PASSO 5: TESTAR SE FUNCIONOU
+
+Acesse no navegador:
+https://licita.pub/teste_basico.php
+
+DEVE mostrar:
+✅ PHP Funciona? SIM!
+✅ .env existe? SIM!
+✅ Config.php existe? SIM!
+✅ Database.php existe? SIM!
+✅ Config carregado
+✅ Conexão estabelecida
+✅ Query executada: XXX licitações
+
+═══════════════════════════════════════════════════════════════
+
+❌ SE DER ERRO 500
+
+Possíveis causas:
+
+1. Arquivo .env não foi incluído no ZIP
+   → Solução: Fazer upload manual do .env para backend/
+
+2. Permissões erradas
+   → Solução via cPanel:
+     - Pastas: 755
+     - Arquivos .php: 644
+     - Arquivo .env: 640
+
+3. Extensão PDO MySQL não instalada
+   → Solução: Contatar suporte Hostinger para instalar pdo_mysql
+
+4. Erro no .htaccess
+   → Solução: Temporariamente renomear para .htaccess.bak
+
+═══════════════════════════════════════════════════════════════
+
+📝 CHECKLIST PÓS-UPLOAD
+
+□ backend/ existe em public_html/
+□ backend/.env existe (tamanho > 0 bytes)
+□ backend/src/Config/Config.php existe
+□ backend/src/Config/Database.php existe
+□ backend/public/teste_basico.php existe
+□ https://licita.pub/teste_basico.php funciona
+□ Teste mostra ✅ em todos os itens
+
+═══════════════════════════════════════════════════════════════
+
+🎯 DEPOIS QUE FUNCIONAR
+
+1. Acesse: https://licita.pub/verificar_duplicatas_web.php
+2. Veja se há duplicatas
+3. Se houver, use: https://licita.pub/limpar_duplicatas_web.php
+4. Execute a migration 004 via SSH ou phpMyAdmin
+5. DELETE os arquivos de teste (teste_basico.php, info.php, etc)
+
+═══════════════════════════════════════════════════════════════
+
+💬 EM CASO DE DÚVIDA
+
+Me envie:
+1. Print da estrutura de pastas no File Manager
+2. Print ou texto do resultado de: https://licita.pub/teste_basico.php
+3. Mensagem de erro completa (se houver)
+
+═══════════════════════════════════════════════════════════════

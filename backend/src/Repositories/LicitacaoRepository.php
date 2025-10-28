@@ -58,6 +58,87 @@ class LicitacaoRepository
     }
 
     /**
+     * Inserir ou atualizar licitação (UPSERT)
+     *
+     * Usa o campo pncp_id como chave única.
+     * Se o pncp_id já existir, atualiza TODOS os campos (exceto id e created_at).
+     * Se não existir, insere um novo registro.
+     *
+     * ⚠️ REQUER: Índice UNIQUE em pncp_id
+     *    Execute: backend/database/migrations/004_adicionar_unique_pncp_id.sql
+     *
+     * @param Licitacao $licitacao Objeto licitação com dados para inserir/atualizar
+     * @return array ['inserido' => bool, 'licitacao' => Licitacao]
+     */
+    public function upsert(Licitacao $licitacao): array
+    {
+        // Gerar ID se não existir
+        if (empty($licitacao->id)) {
+            $licitacao->id = Licitacao::generateUUID();
+        }
+
+        $sql = "INSERT INTO licitacoes (
+            id, pncp_id, orgao_id, numero, objeto, modalidade, situacao,
+            valor_estimado, data_publicacao, data_abertura, data_encerramento,
+            uf, municipio, url_edital, url_pncp, nome_orgao, cnpj_orgao
+        ) VALUES (
+            :id, :pncp_id, :orgao_id, :numero, :objeto, :modalidade, :situacao,
+            :valor_estimado, :data_publicacao, :data_abertura, :data_encerramento,
+            :uf, :municipio, :url_edital, :url_pncp, :nome_orgao, :cnpj_orgao
+        ) ON DUPLICATE KEY UPDATE
+            objeto = VALUES(objeto),
+            modalidade = VALUES(modalidade),
+            situacao = VALUES(situacao),
+            valor_estimado = VALUES(valor_estimado),
+            data_publicacao = VALUES(data_publicacao),
+            data_abertura = VALUES(data_abertura),
+            data_encerramento = VALUES(data_encerramento),
+            uf = VALUES(uf),
+            municipio = VALUES(municipio),
+            url_edital = VALUES(url_edital),
+            url_pncp = VALUES(url_pncp),
+            nome_orgao = VALUES(nome_orgao),
+            cnpj_orgao = VALUES(cnpj_orgao),
+            numero = VALUES(numero),
+            orgao_id = VALUES(orgao_id),
+            atualizado_em = CURRENT_TIMESTAMP";
+
+        $stmt = $this->db->prepare($sql);
+
+        $stmt->execute([
+            ':id' => $licitacao->id,
+            ':pncp_id' => $licitacao->pncp_id,
+            ':orgao_id' => $licitacao->orgao_id,
+            ':numero' => $licitacao->numero,
+            ':objeto' => $licitacao->objeto,
+            ':modalidade' => $licitacao->modalidade,
+            ':situacao' => $licitacao->situacao,
+            ':valor_estimado' => $licitacao->valor_estimado,
+            ':data_publicacao' => $licitacao->data_publicacao,
+            ':data_abertura' => $licitacao->data_abertura,
+            ':data_encerramento' => $licitacao->data_encerramento,
+            ':uf' => $licitacao->uf,
+            ':municipio' => $licitacao->municipio,
+            ':url_edital' => $licitacao->url_edital,
+            ':url_pncp' => $licitacao->url_pncp,
+            ':nome_orgao' => $licitacao->nome_orgao,
+            ':cnpj_orgao' => $licitacao->cnpj_orgao,
+        ]);
+
+        // Verificar se foi inserção (1) ou atualização (2)
+        // rowCount() retorna 1 para INSERT, 2 para UPDATE, 0 se nada mudou
+        $rowCount = $stmt->rowCount();
+        $inserido = ($rowCount === 1);
+
+        $licitacaoAtualizada = $this->findByPncpId($licitacao->pncp_id);
+
+        return [
+            'inserido' => $inserido,
+            'licitacao' => $licitacaoAtualizada
+        ];
+    }
+
+    /**
      * Buscar licitação por ID
      */
     public function findById(string $id): ?Licitacao

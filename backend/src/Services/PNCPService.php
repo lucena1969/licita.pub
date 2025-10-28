@@ -12,6 +12,16 @@ use Exception;
  * Service para integração com a API do PNCP
  *
  * Documentação oficial: https://pncp.gov.br/api/consulta/swagger-ui/index.html
+ *
+ * COMPORTAMENTO DE SINCRONIZAÇÃO:
+ * - Usa UPSERT (INSERT ... ON DUPLICATE KEY UPDATE)
+ * - Se licitação já existe (mesmo pncp_id): ATUALIZA todos os campos
+ * - Se licitação não existe: INSERE novo registro
+ * - Não cria duplicatas (requer índice UNIQUE em pncp_id)
+ *
+ * REQUISITOS:
+ * - Índice UNIQUE em licitacoes.pncp_id
+ * - Execute: backend/database/migrations/004_adicionar_unique_pncp_id.sql
  */
 class PNCPService
 {
@@ -121,8 +131,6 @@ class PNCPService
                 return;
             }
 
-            $licitacaoExistente = $this->licitacaoRepo->findByPncpId($pncpId);
-
             // Garantir que o órgão existe
             $orgaoId = $item['unidadeOrgao']['codigoUnidade'] ?? $item['codigoUnidadeCompradora'] ?? $item['orgaoId'] ?? null;
 
@@ -130,18 +138,19 @@ class PNCPService
                 $this->garantirOrgao($orgaoId, $item);
             }
 
-            // Criar/atualizar licitação
+            // Mapear dados do PNCP para o modelo
             $licitacao = $this->mapearLicitacaoDoPNCP($item);
 
-            if ($licitacaoExistente) {
-                $licitacao->id = $licitacaoExistente->id;
-                $this->licitacaoRepo->update($licitacao);
-                $this->stats['atualizados']++;
-                echo "  ↻ Atualizada: {$pncpId}\n";
-            } else {
-                $this->licitacaoRepo->create($licitacao);
+            // UPSERT: Inserir se novo, atualizar se existente
+            // Retorna: ['inserido' => bool, 'licitacao' => Licitacao]
+            $resultado = $this->licitacaoRepo->upsert($licitacao);
+
+            if ($resultado['inserido']) {
                 $this->stats['novos']++;
                 echo "  ✓ Nova: {$pncpId}\n";
+            } else {
+                $this->stats['atualizados']++;
+                echo "  ↻ Atualizada: {$pncpId}\n";
             }
 
         } catch (Exception $e) {
