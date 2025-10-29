@@ -59,13 +59,13 @@ class LicitacaoController
             $sql = "
                 SELECT
                     pncp_id,
-                    numero_controle,
+                    numero,
                     modalidade,
-                    objeto_simplificado,
+                    objeto,
                     situacao,
                     data_publicacao,
                     valor_estimado,
-                    orgao_cnpj,
+                    cnpj_orgao,
                     municipio,
                     uf
                 FROM licitacoes
@@ -153,9 +153,8 @@ class LicitacaoController
 
             if ($palavraChave) {
                 $where[] = "(
-                    LOWER(objeto_simplificado) LIKE LOWER(:q) OR
-                    LOWER(objeto_detalhado) LIKE LOWER(:q) OR
-                    LOWER(numero_controle) LIKE LOWER(:q)
+                    LOWER(objeto) LIKE LOWER(:q) OR
+                    LOWER(numero) LIKE LOWER(:q)
                 )";
                 $params[':q'] = "%$palavraChave%";
             }
@@ -165,18 +164,18 @@ class LicitacaoController
             $sql = "
                 SELECT
                     pncp_id,
-                    numero_controle,
+                    numero,
                     modalidade,
-                    objeto_simplificado,
+                    objeto,
                     situacao,
                     data_publicacao,
                     valor_estimado,
-                    orgao_cnpj,
+                    cnpj_orgao,
                     municipio,
                     uf
                 FROM licitacoes
                 $whereClause
-                ORDER BY created_at DESC
+                ORDER BY sincronizado_em DESC
                 LIMIT :limite OFFSET :offset
             ";
 
