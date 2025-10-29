@@ -13,7 +13,15 @@ class AuthService {
      * Verificar se usuário está autenticado
      */
     isAuthenticated() {
-        return this.usuario !== null && api.getSessionId() !== null;
+        // Verificar apenas se tem token (mais confiável)
+        return api.getSessionId() !== null;
+    }
+
+    /**
+     * Obter token de autenticação
+     */
+    getToken() {
+        return api.getSessionId();
     }
 
     /**
