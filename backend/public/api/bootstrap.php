@@ -15,6 +15,12 @@ header('Content-Type: application/json; charset=utf-8');
 // Autoloader
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+// Carregar variáveis de ambiente (.env)
+use Dotenv\Dotenv;
+
+$dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
+$dotenv->load();
+
 // Aplicar CORS Middleware
 use App\Middleware\CorsMiddleware;
 
