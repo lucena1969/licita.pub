@@ -211,10 +211,7 @@
             }
         }
 
-        // Verificar se já está autenticado
-        if (auth.isAuthenticated()) {
-            window.location.href = '/frontend/consultas.html';
-        }
+        // Não redirecionar automaticamente - permitir novo cadastro
 
         // Submeter formulário
         form.addEventListener('submit', async (e) => {

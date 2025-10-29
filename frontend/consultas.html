@@ -490,10 +490,8 @@
         let paginaAtual = 1;
         let filtrosAtuais = {};
 
-        // Verificar autenticação
-        if (!auth.isAuthenticated()) {
-            window.location.href = '/frontend/login.html';
-        }
+        // Página acessível para todos (autenticados ou não)
+        // O limite será controlado pela API
 
         // Carregar dados do usuário
         async function carregarUsuario() {
