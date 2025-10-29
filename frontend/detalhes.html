@@ -274,8 +274,9 @@
                 const headers = {};
 
                 // Adicionar token se autenticado
-                if (auth.isAuthenticated()) {
-                    headers['Authorization'] = `Bearer ${auth.getToken()}`;
+                const token = api.getSessionId();
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
                 }
 
                 const response = await fetch(`/api/licitacoes/detalhes.php?id=${licitacaoId}`, {

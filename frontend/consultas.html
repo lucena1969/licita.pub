@@ -504,10 +504,13 @@
         // Carregar informações de limite
         async function carregarLimite() {
             try {
+                const token = api.getSessionId();
+                const headers = token ? {
+                    'Authorization': `Bearer ${token}`
+                } : {};
+
                 const response = await fetch('/api/licitacoes/limite.php', {
-                    headers: {
-                        'Authorization': `Bearer ${auth.getToken()}`
-                    }
+                    headers: headers
                 });
                 const data = await response.json();
 
@@ -537,10 +540,13 @@
                     limite: 20
                 });
 
+                const token = api.getSessionId();
+                const headers = token ? {
+                    'Authorization': `Bearer ${token}`
+                } : {};
+
                 const response = await fetch(`/api/licitacoes/buscar.php?${params}`, {
-                    headers: {
-                        'Authorization': `Bearer ${auth.getToken()}`
-                    }
+                    headers: headers
                 });
 
                 const data = await response.json();
