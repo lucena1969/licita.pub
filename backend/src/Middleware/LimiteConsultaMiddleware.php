@@ -23,7 +23,7 @@ class LimiteConsultaMiddleware
     {
         $db = Database::getConnection();
         $this->limiteService = new LimiteService($db);
-        $this->authService = new AuthService($db);
+        $this->authService = new AuthService();
     }
 
     /**
@@ -44,10 +44,7 @@ class LimiteConsultaMiddleware
 
         if (!empty($authHeader) && str_starts_with($authHeader, 'Bearer ')) {
             $token = substr($authHeader, 7);
-            $sessao = $this->authService->verificarSessao($token);
-            if ($sessao) {
-                $usuario = $sessao['usuario'];
-            }
+            $usuario = $this->authService->verificarSessao($token);
         }
 
         // 3. Verificar limite
@@ -131,7 +128,7 @@ class LimiteConsultaMiddleware
     {
         $db = Database::getConnection();
         $limiteService = new LimiteService($db);
-        $authService = new AuthService($db);
+        $authService = new AuthService();
 
         $ip = LimiteService::getClientIP();
         $usuario = null;
@@ -140,10 +137,7 @@ class LimiteConsultaMiddleware
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
         if (!empty($authHeader) && str_starts_with($authHeader, 'Bearer ')) {
             $token = substr($authHeader, 7);
-            $sessao = $authService->verificarSessao($token);
-            if ($sessao) {
-                $usuario = $sessao['usuario'];
-            }
+            $usuario = $authService->verificarSessao($token);
         }
 
         return $limiteService->verificarLimite($usuario, $ip);
