@@ -280,7 +280,8 @@
                 }
 
                 const response = await fetch(`/api/licitacoes/detalhes.php?id=${licitacaoId}`, {
-                    headers: headers
+                    headers: headers,
+                    cache: 'no-cache'
                 });
 
                 const data = await response.json();
