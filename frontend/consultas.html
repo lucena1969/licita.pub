@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Licitações - Licita.pub</title>
+    <meta name="description" content="Consulte licitações públicas de todo o Brasil.">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background-color: #1351b4;
+            color: white;
+            padding: 1rem 0;
+            border-bottom: 3px solid #0c326f;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+        }
+
+        .btn-logout {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-logout:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Limite Counter */
+        .limite-bar {
+            background-color: #e8f0fe;
+            border-bottom: 1px solid #ccc;
+            padding: 12px 0;
+        }
+
+        .limite-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .limite-info {
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .limite-count {
+            font-weight: 600;
+            color: #1351b4;
+        }
+
+        .limite-renova {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Filtros */
+        .filtros {
+            background-color: white;
+            border: 1px solid #d4d4d4;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filtros h2 {
+            font-size: 1.1rem;
+            color: #1351b4;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .filtros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            background-color: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #1351b4;
+        }
+
+        .btn-buscar {
+            background-color: #1351b4;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-buscar:hover {
+            background-color: #0c326f;
+        }
+
+        .btn-limpar {
+            background-color: transparent;
+            color: #666;
+            border: 1px solid #ccc;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .btn-limpar:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* Resultados */
+        .resultados {
+            background-color: white;
+            border: 1px solid #d4d4d4;
+        }
+
+        .resultados-header {
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #d4d4d4;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .resultados-header h2 {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .total-resultados {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1351b4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Lista de Licitações */
+        .licitacao-item {
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .licitacao-item:hover {
+            background-color: #f8f8f8;
+        }
+
+        .licitacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .licitacao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .licitacao-numero {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1351b4;
+        }
+
+        .licitacao-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background-color: #e8f0fe;
+            color: #1351b4;
+        }
+
+        .licitacao-objeto {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .licitacao-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .licitacao-info span {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Paginação */
+        .paginacao {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .paginacao button {
+            padding: 8px 12px;
+            border: 1px solid #d4d4d4;
+            background-color: white;
+            color: #555;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .paginacao button:hover {
+            background-color: #f5f5f5;
+        }
+
+        .paginacao button.ativo {
+            background-color: #1351b4;
+            color: white;
+            border-color: #1351b4;
+        }
+
+        .paginacao button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .empty-state h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        /* Alerta */
+        .alerta {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            color: #856404;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .limite-container {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+
+            .filtros-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .licitacao-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">Licita.pub</div>
+            <div class="user-info">
+                <span class="user-name" id="user-name">Carregando...</span>
+                <button class="btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de Limite -->
+    <div class="limite-bar">
+        <div class="limite-container">
+            <div class="limite-info">
+                Consultas hoje: <span class="limite-count" id="limite-count">-/-</span>
+            </div>
+            <div class="limite-renova" id="limite-renova">-</div>
+        </div>
+    </div>
+
+    <!-- Container Principal -->
+    <div class="container">
+        <!-- Alerta (se necessário) -->
+        <div id="alerta-container"></div>
+
+        <!-- Filtros -->
+        <div class="filtros">
+            <h2>Filtrar Licitações</h2>
+            <form id="form-filtros">
+                <div class="filtros-grid">
+                    <div class="form-group">
+                        <label for="busca">Palavra-chave</label>
+                        <input type="text" id="busca" name="busca" placeholder="Ex: computador, serviço, obra">
+                    </div>
+                    <div class="form-group">
+                        <label for="uf">Estado (UF)</label>
+                        <select id="uf" name="uf">
+                            <option value="">Todos os estados</option>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="municipio">Município</label>
+                        <input type="text" id="municipio" name="municipio" placeholder="Ex: São Paulo">
+                    </div>
+                    <div class="form-group">
+                        <label for="modalidade">Modalidade</label>
+                        <select id="modalidade" name="modalidade">
+                            <option value="">Todas as modalidades</option>
+                            <option value="Pregão Eletrônico">Pregão Eletrônico</option>
+                            <option value="Pregão Presencial">Pregão Presencial</option>
+                            <option value="Concorrência">Concorrência</option>
+                            <option value="Tomada de Preços">Tomada de Preços</option>
+                            <option value="Convite">Convite</option>
+                            <option value="Dispensa">Dispensa</option>
+                            <option value="Inexigibilidade">Inexigibilidade</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button type="submit" class="btn-buscar">Buscar</button>
+                    <button type="button" class="btn-limpar" onclick="limparFiltros()">Limpar filtros</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Resultados -->
+        <div class="resultados">
+            <div class="resultados-header">
+                <h2>Licitações Encontradas</h2>
+                <span class="total-resultados" id="total-resultados">-</span>
+            </div>
+
+            <div id="lista-licitacoes">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Carregando licitações...</p>
+                </div>
+            </div>
+
+            <div class="paginacao" id="paginacao" style="display: none;">
+                <!-- Botões de paginação serão inseridos aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/auth.js"></script>
+    <script>
+        let paginaAtual = 1;
+        let filtrosAtuais = {};
+
+        // Verificar autenticação
+        if (!auth.isAuthenticated()) {
+            window.location.href = '/frontend/login.html';
+        }
+
+        // Carregar dados do usuário
+        async function carregarUsuario() {
+            const response = await api.me();
+            if (response.success && response.data) {
+                document.getElementById('user-name').textContent = response.data.nome;
+            }
+        }
+
+        // Carregar informações de limite
+        async function carregarLimite() {
+            try {
+                const response = await fetch('/api/licitacoes/limite.php', {
+                    headers: {
+                        'Authorization': `Bearer ${auth.getToken()}`
+                    }
+                });
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    const info = data.data.info || data.data;
+                    const restantes = info.restantes || 0;
+                    const limite = info.limite_diario || 0;
+                    const formatado = info.tempo_restante_formatado || '';
+
+                    document.getElementById('limite-count').textContent = `${limite - restantes}/${limite}`;
+                    document.getElementById('limite-renova').textContent = formatado || 'Renova em 24h';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar limite:', error);
+            }
+        }
+
+        // Buscar licitações
+        async function buscarLicitacoes(pagina = 1) {
+            const listaElement = document.getElementById('lista-licitacoes');
+            listaElement.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando licitações...</p></div>';
+
+            try {
+                const params = new URLSearchParams({
+                    ...filtrosAtuais,
+                    pagina: pagina,
+                    limite: 20
+                });
+
+                const response = await fetch(`/api/licitacoes/buscar.php?${params}`, {
+                    headers: {
+                        'Authorization': `Bearer ${auth.getToken()}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.data) {
+                    renderizarLicitacoes(data.data);
+                    renderizarPaginacao(data.paginacao);
+                    document.getElementById('total-resultados').textContent =
+                        `${data.paginacao.total} resultado(s)`;
+                } else {
+                    listaElement.innerHTML = '<div class="empty-state"><h3>Nenhuma licitação encontrada</h3><p>Tente ajustar os filtros de busca.</p></div>';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar licitações:', error);
+                listaElement.innerHTML = '<div class="empty-state"><h3>Erro ao carregar</h3><p>Ocorreu um erro ao buscar as licitações.</p></div>';
+            }
+        }
+
+        // Renderizar lista de licitações
+        function renderizarLicitacoes(licitacoes) {
+            const listaElement = document.getElementById('lista-licitacoes');
+
+            if (licitacoes.length === 0) {
+                listaElement.innerHTML = '<div class="empty-state"><h3>Nenhuma licitação encontrada</h3><p>Tente ajustar os filtros de busca.</p></div>';
+                return;
+            }
+
+            listaElement.innerHTML = licitacoes.map(lic => `
+                <div class="licitacao-item" onclick="verDetalhes('${lic.pncp_id}')">
+                    <div class="licitacao-header">
+                        <div class="licitacao-numero">${lic.numero_controle || lic.pncp_id}</div>
+                        <div class="licitacao-status">${lic.situacao || 'N/D'}</div>
+                    </div>
+                    <div class="licitacao-objeto">
+                        ${lic.objeto_simplificado || 'Sem descrição'}
+                    </div>
+                    <div class="licitacao-info">
+                        <span><strong>Modalidade:</strong> ${lic.modalidade || 'N/D'}</span>
+                        <span><strong>UF:</strong> ${lic.uf || 'N/D'}</span>
+                        <span><strong>Município:</strong> ${lic.municipio || 'N/D'}</span>
+                        ${lic.valor_estimado ? `<span><strong>Valor:</strong> R$ ${parseFloat(lic.valor_estimado).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Renderizar paginação
+        function renderizarPaginacao(paginacao) {
+            const paginacaoElement = document.getElementById('paginacao');
+
+            if (paginacao.total_paginas <= 1) {
+                paginacaoElement.style.display = 'none';
+                return;
+            }
+
+            paginacaoElement.style.display = 'flex';
+
+            let html = `
+                <button onclick="buscarLicitacoes(${paginacao.pagina - 1})" ${paginacao.pagina === 1 ? 'disabled' : ''}>Anterior</button>
+            `;
+
+            for (let i = 1; i <= Math.min(paginacao.total_paginas, 10); i++) {
+                html += `<button class="${i === paginacao.pagina ? 'ativo' : ''}" onclick="buscarLicitacoes(${i})">${i}</button>`;
+            }
+
+            html += `
+                <button onclick="buscarLicitacoes(${paginacao.pagina + 1})" ${paginacao.pagina === paginacao.total_paginas ? 'disabled' : ''}>Próxima</button>
+            `;
+
+            paginacaoElement.innerHTML = html;
+        }
+
+        // Ver detalhes
+        function verDetalhes(pncpId) {
+            window.location.href = `/frontend/detalhes.html?id=${pncpId}`;
+        }
+
+        // Limpar filtros
+        function limparFiltros() {
+            document.getElementById('form-filtros').reset();
+            filtrosAtuais = {};
+            paginaAtual = 1;
+            buscarLicitacoes(1);
+        }
+
+        // Logout
+        async function logout() {
+            await auth.logout();
+            window.location.href = '/frontend/login.html';
+        }
+
+        // Submeter formulário de filtros
+        document.getElementById('form-filtros').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            filtrosAtuais = {
+                q: document.getElementById('busca').value.trim(),
+                uf: document.getElementById('uf').value,
+                municipio: document.getElementById('municipio').value.trim(),
+                modalidade: document.getElementById('modalidade').value
+            };
+
+            // Remover campos vazios
+            Object.keys(filtrosAtuais).forEach(key => {
+                if (!filtrosAtuais[key]) delete filtrosAtuais[key];
+            });
+
+            paginaAtual = 1;
+            buscarLicitacoes(1);
+        });
+
+        // Inicializar
+        carregarUsuario();
+        carregarLimite();
+        buscarLicitacoes(1);
+
+        // Atualizar limite a cada minuto
+        setInterval(carregarLimite, 60000);
+    </script>
+</body>
+</html>

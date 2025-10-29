@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Licitação - Licita.pub</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background-color: #1351b4;
+            color: white;
+            padding: 1rem 0;
+            border-bottom: 3px solid #0c326f;
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .btn-voltar {
+            background-color: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 6px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            text-decoration: none;
+        }
+
+        .btn-voltar:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1351b4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Card Principal */
+        .card {
+            background-color: white;
+            border: 1px solid #d4d4d4;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            border-bottom: 2px solid #1351b4;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-header h1 {
+            font-size: 1.4rem;
+            color: #1351b4;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .card-header .numero {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background-color: #e8f0fe;
+            color: #1351b4;
+            margin-top: 10px;
+        }
+
+        /* Seções */
+        .secao {
+            margin-bottom: 30px;
+        }
+
+        .secao h2 {
+            font-size: 1.1rem;
+            color: #1351b4;
+            margin-bottom: 15px;
+            font-weight: 600;
+            border-left: 3px solid #1351b4;
+            padding-left: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .info-valor {
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .objeto-texto {
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.7;
+            text-align: justify;
+        }
+
+        /* Alerta de Limite */
+        .alerta-limite {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-radius: 3px;
+        }
+
+        .alerta-limite h2 {
+            color: #856404;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .alerta-limite p {
+            color: #856404;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .btn-cadastrar {
+            background-color: #1351b4;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cadastrar:hover {
+            background-color: #0c326f;
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: white;
+            border: 1px solid #d4d4d4;
+        }
+
+        .error-state h2 {
+            color: #d32f2f;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+        }
+
+        .error-state p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card {
+                padding: 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">Licita.pub</div>
+            <a href="/frontend/consultas.html" class="btn-voltar">← Voltar</a>
+        </div>
+    </header>
+
+    <!-- Container -->
+    <div class="container">
+        <div id="conteudo">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Carregando detalhes da licitação...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="/frontend/js/api.js"></script>
+    <script src="/frontend/js/auth.js"></script>
+    <script>
+        // Obter ID da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const licitacaoId = urlParams.get('id');
+
+        if (!licitacaoId) {
+            mostrarErro('ID da licitação não fornecido');
+        } else {
+            carregarDetalhes();
+        }
+
+        async function carregarDetalhes() {
+            try {
+                const headers = {};
+
+                // Adicionar token se autenticado
+                if (auth.isAuthenticated()) {
+                    headers['Authorization'] = `Bearer ${auth.getToken()}`;
+                }
+
+                const response = await fetch(`/api/licitacoes/detalhes.php?id=${licitacaoId}`, {
+                    headers: headers
+                });
+
+                const data = await response.json();
+
+                if (response.status === 429) {
+                    // Limite atingido
+                    mostrarAlertaLimite(data);
+                } else if (data.success && data.data) {
+                    renderizarDetalhes(data.data);
+                } else {
+                    mostrarErro(data.message || 'Erro ao carregar detalhes');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro('Erro ao conectar com o servidor');
+            }
+        }
+
+        function renderizarDetalhes(licitacao) {
+            const conteudo = document.getElementById('conteudo');
+
+            conteudo.innerHTML = `
+                <div class="card">
+                    <div class="card-header">
+                        <h1>${licitacao.objeto_simplificado || 'Licitação'}</h1>
+                        <div class="numero">Nº ${licitacao.numero_controle || licitacao.pncp_id}</div>
+                        <div class="status-badge">${licitacao.situacao || 'N/D'}</div>
+                    </div>
+
+                    <div class="secao">
+                        <h2>Informações Gerais</h2>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Modalidade</div>
+                                <div class="info-valor">${licitacao.modalidade || 'Não informado'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">CNPJ do Órgão</div>
+                                <div class="info-valor">${licitacao.orgao_cnpj || 'Não informado'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">UF</div>
+                                <div class="info-valor">${licitacao.uf || 'Não informado'}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Município</div>
+                                <div class="info-valor">${licitacao.municipio || 'Não informado'}</div>
+                            </div>
+                            ${licitacao.data_publicacao ? `
+                            <div class="info-item">
+                                <div class="info-label">Data de Publicação</div>
+                                <div class="info-valor">${formatarData(licitacao.data_publicacao)}</div>
+                            </div>
+                            ` : ''}
+                            ${licitacao.data_abertura ? `
+                            <div class="info-item">
+                                <div class="info-label">Data de Abertura</div>
+                                <div class="info-valor">${formatarData(licitacao.data_abertura)}</div>
+                            </div>
+                            ` : ''}
+                            ${licitacao.valor_estimado ? `
+                            <div class="info-item">
+                                <div class="info-label">Valor Estimado</div>
+                                <div class="info-valor">R$ ${parseFloat(licitacao.valor_estimado).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${licitacao.objeto_detalhado ? `
+                    <div class="secao">
+                        <h2>Objeto Detalhado</h2>
+                        <div class="objeto-texto">${licitacao.objeto_detalhado}</div>
+                    </div>
+                    ` : ''}
+
+                    ${licitacao.link_pncp ? `
+                    <div class="secao">
+                        <h2>Documentos Oficiais</h2>
+                        <p style="margin-bottom: 10px; color: #666;">Acesse o Portal Nacional de Contratações Públicas para ver editais, anexos e outros documentos:</p>
+                        <a href="${licitacao.link_pncp}" target="_blank" class="btn-cadastrar" style="display: inline-block;">
+                            Ver no PNCP →
+                        </a>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function mostrarAlertaLimite(data) {
+            const conteudo = document.getElementById('conteudo');
+            const estaLogado = auth.isAuthenticated();
+
+            conteudo.innerHTML = `
+                <div class="alerta-limite">
+                    <h2>⚠️ Limite de Consultas Atingido</h2>
+                    <p>${data.message || 'Você atingiu o limite de consultas detalhadas.'}</p>
+                    ${!estaLogado ? `
+                        <a href="/frontend/cadastro.html" class="btn-cadastrar">
+                            Criar Conta Grátis - 10 consultas/dia
+                        </a>
+                    ` : `
+                        <p style="margin-top: 15px; color: #666;">
+                            ${data.limite?.tempo_restante_formatado || 'Aguarde até amanhã para novas consultas'}
+                        </p>
+                        <a href="/frontend/consultas.html" class="btn-cadastrar" style="margin-top: 10px;">
+                            Voltar para Consultas
+                        </a>
+                    `}
+                </div>
+            `;
+        }
+
+        function mostrarErro(mensagem) {
+            const conteudo = document.getElementById('conteudo');
+
+            conteudo.innerHTML = `
+                <div class="error-state">
+                    <h2>❌ Erro</h2>
+                    <p>${mensagem}</p>
+                    <a href="/frontend/consultas.html" class="btn-cadastrar" style="margin-top: 20px;">
+                        Voltar para Consultas
+                    </a>
+                </div>
+            `;
+        }
+
+        function formatarData(data) {
+            if (!data) return 'Não informado';
+            const d = new Date(data);
+            return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+    </script>
+</body>
+</html>
