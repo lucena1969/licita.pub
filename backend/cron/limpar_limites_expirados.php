@@ -25,7 +25,7 @@ use App\Repositories\LimiteIPRepository;
 
 try {
     // Conectar ao banco
-    $db = Database::getInstance()->getConnection();
+    $db = Database::getConnection();
 
     echo "✓ Conectado ao banco de dados\n\n";
 

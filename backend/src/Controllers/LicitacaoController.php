@@ -21,7 +21,7 @@ class LicitacaoController
 
     public function __construct()
     {
-        $this->db = Database::getInstance()->getConnection();
+        $this->db = Database::getConnection();
         $this->limiteService = new LimiteService($this->db);
     }
 

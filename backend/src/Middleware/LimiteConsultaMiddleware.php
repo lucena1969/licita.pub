@@ -21,7 +21,7 @@ class LimiteConsultaMiddleware
 
     public function __construct()
     {
-        $db = Database::getInstance()->getConnection();
+        $db = Database::getConnection();
         $this->limiteService = new LimiteService($db);
         $this->authService = new AuthService($db);
     }
@@ -129,7 +129,7 @@ class LimiteConsultaMiddleware
      */
     public static function getInfo(): array
     {
-        $db = Database::getInstance()->getConnection();
+        $db = Database::getConnection();
         $limiteService = new LimiteService($db);
         $authService = new AuthService($db);
 
