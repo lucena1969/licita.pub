@@ -36,8 +36,36 @@ try {
 
     echo "<h2>✓ Controller instanciado</h2>";
 
-    // Executar busca
-    $resultado = $controller->buscar();
+    // Capturar erros com try-catch mais detalhado
+    ob_start();
+
+    try {
+        // Executar busca
+        $resultado = $controller->buscar();
+    } catch (\Throwable $e) {
+        $output = ob_get_clean();
+        echo "<h2 style='color: red;'>EXCEÇÃO CAPTURADA:</h2>";
+        echo "<pre>";
+        echo "Mensagem: " . $e->getMessage() . "\n";
+        echo "Arquivo: " . $e->getFile() . "\n";
+        echo "Linha: " . $e->getLine() . "\n";
+        echo "\nStack trace:\n";
+        echo $e->getTraceAsString();
+        echo "</pre>";
+
+        if ($output) {
+            echo "<h3>Output capturado:</h3>";
+            echo "<pre>$output</pre>";
+        }
+        exit;
+    }
+
+    $output = ob_get_clean();
+
+    if ($output) {
+        echo "<h3>Warnings/Notices:</h3>";
+        echo "<pre>$output</pre>";
+    }
 
     echo "<h2>Resultado:</h2>";
     echo "<pre>";
