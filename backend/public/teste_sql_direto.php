@@ -59,18 +59,18 @@ try {
     $sql = "
         SELECT
             pncp_id,
-            numero_controle,
+            numero,
             modalidade,
-            objeto_simplificado,
+            objeto,
             situacao,
             data_publicacao,
             valor_estimado,
-            orgao_cnpj,
+            cnpj_orgao,
             municipio,
             uf
         FROM licitacoes
         $whereClause
-        ORDER BY created_at DESC
+        ORDER BY sincronizado_em DESC
         LIMIT :limite OFFSET :offset
     ";
 
@@ -110,7 +110,7 @@ try {
             echo "<td>{$lic['pncp_id']}</td>";
             echo "<td>{$lic['uf']}</td>";
             echo "<td>{$lic['municipio']}</td>";
-            echo "<td>" . substr($lic['objeto_simplificado'], 0, 80) . "...</td>";
+            echo "<td>" . substr($lic['objeto'], 0, 80) . "...</td>";
             echo "</tr>";
         }
 
