@@ -306,8 +306,8 @@
             conteudo.innerHTML = `
                 <div class="card">
                     <div class="card-header">
-                        <h1>${licitacao.objeto_simplificado || 'Licitação'}</h1>
-                        <div class="numero">Nº ${licitacao.numero_controle || licitacao.pncp_id}</div>
+                        <h1>${licitacao.objeto || 'Licitação'}</h1>
+                        <div class="numero">Nº ${licitacao.numero || licitacao.pncp_id}</div>
                         <div class="status-badge">${licitacao.situacao || 'N/D'}</div>
                     </div>
 
@@ -320,7 +320,7 @@
                             </div>
                             <div class="info-item">
                                 <div class="info-label">CNPJ do Órgão</div>
-                                <div class="info-valor">${licitacao.orgao_cnpj || 'Não informado'}</div>
+                                <div class="info-valor">${licitacao.cnpj_orgao || 'Não informado'}</div>
                             </div>
                             <div class="info-item">
                                 <div class="info-label">UF</div>
@@ -351,18 +351,11 @@
                         </div>
                     </div>
 
-                    ${licitacao.objeto_detalhado ? `
-                    <div class="secao">
-                        <h2>Objeto Detalhado</h2>
-                        <div class="objeto-texto">${licitacao.objeto_detalhado}</div>
-                    </div>
-                    ` : ''}
-
-                    ${licitacao.link_pncp ? `
+                    ${licitacao.url_pncp ? `
                     <div class="secao">
                         <h2>Documentos Oficiais</h2>
                         <p style="margin-bottom: 10px; color: #666;">Acesse o Portal Nacional de Contratações Públicas para ver editais, anexos e outros documentos:</p>
-                        <a href="${licitacao.link_pncp}" target="_blank" class="btn-cadastrar" style="display: inline-block;">
+                        <a href="${licitacao.url_pncp}" target="_blank" class="btn-cadastrar" style="display: inline-block;">
                             Ver no PNCP →
                         </a>
                     </div>
