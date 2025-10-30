@@ -581,7 +581,7 @@
                         <div class="licitacao-status">${lic.situacao || 'N/D'}</div>
                     </div>
                     <div class="licitacao-objeto">
-                        ${lic.objeto_simplificado || 'Sem descrição'}
+                        ${lic.objeto || 'Sem descrição'}
                     </div>
                     <div class="licitacao-info">
                         <span><strong>Modalidade:</strong> ${lic.modalidade || 'N/D'}</span>
@@ -621,7 +621,7 @@
 
         // Ver detalhes
         function verDetalhes(pncpId) {
-            window.location.href = `/frontend/detalhes.html?id=${pncpId}`;
+            window.location.href = `/frontend/detalhes.html?id=${encodeURIComponent(pncpId)}`;
         }
 
         // Limpar filtros

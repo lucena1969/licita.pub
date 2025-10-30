@@ -261,7 +261,7 @@
     <script>
         // Obter ID da URL
         const urlParams = new URLSearchParams(window.location.search);
-        const licitacaoId = urlParams.get('id');
+        const licitacaoId = urlParams.get('id') ? decodeURIComponent(urlParams.get('id')) : null;
 
         if (!licitacaoId) {
             mostrarErro('ID da licitação não fornecido');
@@ -279,7 +279,7 @@
                     headers['Authorization'] = `Bearer ${token}`;
                 }
 
-                const response = await fetch(`/api/licitacoes/detalhes.php?id=${licitacaoId}`, {
+                const response = await fetch(`/api/licitacoes/detalhes.php?id=${encodeURIComponent(licitacaoId)}`, {
                     headers: headers,
                     cache: 'no-cache'
                 });

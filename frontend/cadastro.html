@@ -242,12 +242,26 @@
 
                 if (response.success && response.usuario) {
                     // Cadastro bem-sucedido
-                    showAlert('Conta criada com sucesso! Redirecionando...', 'success');
+                    setLoading(false);
 
-                    // Redirecionar após 1 segundo
-                    setTimeout(() => {
-                        window.location.href = '/frontend/consultas.html';
-                    }, 1000);
+                    // Mostrar mensagem de sucesso com instruções
+                    const mensagem = `
+                        <div style="text-align: center; padding: 20px;">
+                            <h3 style="color: #10b981; margin-bottom: 15px;">✓ Conta criada com sucesso!</h3>
+                            <p style="margin-bottom: 10px;">Enviamos um email de verificação para:</p>
+                            <p style="font-weight: 600; color: #1351b4; margin-bottom: 15px;">${formData.email}</p>
+                            <p style="margin-bottom: 10px;">Por favor, verifique sua caixa de entrada e clique no link de confirmação para ativar sua conta.</p>
+                            <p style="font-size: 0.9rem; color: #666; margin-top: 15px;">Não recebeu o email? Verifique a pasta de spam ou <a href="#" onclick="reenviarEmail('${formData.email}'); return false;" style="color: #1351b4; text-decoration: underline;">clique aqui para reenviar</a>.</p>
+                        </div>
+                    `;
+
+                    alertContainer.innerHTML = mensagem;
+
+                    // Limpar formulário
+                    form.reset();
+
+                    // Scroll para o topo
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 } else {
                     // Erro no cadastro
                     const errors = response.data?.errors || ['Erro ao criar conta. Tente novamente.'];
@@ -260,6 +274,31 @@
                 setLoading(false);
             }
         });
+
+        // Função para reenviar email de verificação
+        async function reenviarEmail(email) {
+            try {
+                const response = await fetch('/api/auth/reenviar-verificacao.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Email de verificação reenviado! Verifique sua caixa de entrada.', 'success');
+                } else {
+                    const errors = data.errors || ['Erro ao reenviar email. Tente novamente.'];
+                    showAlert(errors, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao reenviar email:', error);
+                showAlert(['Erro ao conectar com o servidor. Tente novamente.'], 'error');
+            }
+        }
     </script>
 </body>
 </html>

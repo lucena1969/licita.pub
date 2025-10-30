@@ -178,9 +178,23 @@
                         window.location.href = '/frontend/consultas.html';
                     }, 500);
                 } else {
-                    // Erro no login
-                    const errors = response.data?.errors || ['Email ou senha inválidos'];
-                    showAlert(errors, 'error');
+                    // Verificar se é erro de email não verificado
+                    if (response.data?.email_nao_verificado || response.email_nao_verificado) {
+                        const userEmail = response.data?.email || response.email || email;
+                        const mensagem = `
+                            <div style="text-align: center; padding: 15px;">
+                                <h4 style="color: #f59e0b; margin-bottom: 10px;">⚠️ Email não verificado</h4>
+                                <p style="margin-bottom: 10px;">Por favor, verifique seu email e clique no link de confirmação antes de fazer login.</p>
+                                <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">Não recebeu o email? <a href="#" onclick="reenviarEmail('${userEmail}'); return false;" style="color: #1351b4; text-decoration: underline; font-weight: 600;">Clique aqui para reenviar</a></p>
+                            </div>
+                        `;
+                        alertContainer.innerHTML = mensagem;
+                    } else {
+                        // Erro no login
+                        const errors = response.data?.errors || ['Email ou senha inválidos'];
+                        showAlert(errors, 'error');
+                    }
+
                     setLoading(false);
 
                     // Limpar senha
@@ -193,6 +207,31 @@
                 setLoading(false);
             }
         });
+
+        // Função para reenviar email de verificação
+        async function reenviarEmail(email) {
+            try {
+                const response = await fetch('/api/auth/reenviar-verificacao.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email }),
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('Email de verificação reenviado! Verifique sua caixa de entrada.', 'success');
+                } else {
+                    const errors = data.errors || ['Erro ao reenviar email. Tente novamente.'];
+                    showAlert(errors, 'error');
+                }
+            } catch (error) {
+                console.error('Erro ao reenviar email:', error);
+                showAlert(['Erro ao conectar com o servidor. Tente novamente.'], 'error');
+            }
+        }
     </script>
 </body>
 </html>

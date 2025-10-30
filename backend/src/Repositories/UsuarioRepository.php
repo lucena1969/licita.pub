@@ -169,4 +169,58 @@ class UsuarioRepository
 
         return $stmt->execute([':id' => $id]);
     }
+
+    /**
+     * Buscar usuário por token de verificação de email
+     */
+    public function findByVerificationToken(string $token): ?Usuario
+    {
+        $sql = "SELECT * FROM usuarios WHERE token_verificacao = :token LIMIT 1";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([':token' => $token]);
+
+        $data = $stmt->fetch();
+
+        return $data ? Usuario::fromArray($data) : null;
+    }
+
+    /**
+     * Marcar email como verificado
+     */
+    public function markEmailAsVerified(string $userId): bool
+    {
+        $sql = "UPDATE usuarios SET
+            email_verificado = 1,
+            token_verificacao = NULL,
+            token_verificacao_expira = NULL,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = :id";
+
+        $stmt = $this->db->prepare($sql);
+
+        return $stmt->execute([':id' => $userId]);
+    }
+
+    /**
+     * Limpar campos vazios (converter strings vazias para NULL)
+     */
+    public function limparCamposVazios(): array
+    {
+        // CPF/CNPJ vazios
+        $sql1 = "UPDATE usuarios SET cpf_cnpj = NULL WHERE cpf_cnpj = ''";
+        $stmt1 = $this->db->prepare($sql1);
+        $stmt1->execute();
+        $cpfCnpjCount = $stmt1->rowCount();
+
+        // Telefones vazios
+        $sql2 = "UPDATE usuarios SET telefone = NULL WHERE telefone = ''";
+        $stmt2 = $this->db->prepare($sql2);
+        $stmt2->execute();
+        $telefoneCount = $stmt2->rowCount();
+
+        return [
+            'cpf_cnpj_atualizados' => $cpfCnpjCount,
+            'telefones_atualizados' => $telefoneCount,
+        ];
+    }
 }

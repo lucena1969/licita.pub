@@ -44,8 +44,14 @@ class AuthService
         $usuario->email = strtolower(trim($data['email']));
         $usuario->senha = password_hash($data['senha'], PASSWORD_BCRYPT);
         $usuario->nome = trim($data['nome']);
-        $usuario->telefone = isset($data['telefone']) ? preg_replace('/[^0-9]/', '', $data['telefone']) : null;
-        $usuario->cpf_cnpj = isset($data['cpf_cnpj']) ? preg_replace('/[^0-9]/', '', $data['cpf_cnpj']) : null;
+
+        // Telefone - converter vazio para null
+        $telefone = isset($data['telefone']) ? preg_replace('/[^0-9]/', '', $data['telefone']) : '';
+        $usuario->telefone = !empty($telefone) ? $telefone : null;
+
+        // CPF/CNPJ - converter vazio para null
+        $cpfCnpj = isset($data['cpf_cnpj']) ? preg_replace('/[^0-9]/', '', $data['cpf_cnpj']) : '';
+        $usuario->cpf_cnpj = !empty($cpfCnpj) ? $cpfCnpj : null;
         $usuario->plano = 'FREE';
         $usuario->ativo = true;
         $usuario->email_verificado = false;
@@ -57,10 +63,23 @@ class AuthService
         try {
             $usuarioCriado = $this->usuarioRepo->create($usuario);
 
+            // Enviar email de verificação
+            $emailService = new EmailService();
+            $emailEnviado = $emailService->enviarEmailVerificacao(
+                $usuarioCriado->email,
+                $usuarioCriado->nome,
+                $usuarioCriado->token_verificacao
+            );
+
+            if (!$emailEnviado) {
+                error_log("Falha ao enviar email de verificação para: {$usuarioCriado->email}");
+            }
+
             return [
                 'success' => true,
                 'usuario' => $usuarioCriado->toArray(),
-                'message' => 'Usuário cadastrado com sucesso',
+                'message' => 'Usuário cadastrado com sucesso! Verifique seu email para confirmar o cadastro.',
+                'email_enviado' => $emailEnviado,
             ];
         } catch (\Exception $e) {
             return [
@@ -107,6 +126,16 @@ class AuthService
             return [
                 'success' => false,
                 'errors' => ['Usuário inativo. Entre em contato com o suporte.'],
+            ];
+        }
+
+        // Verificar se email foi verificado
+        if (!$usuario->email_verificado) {
+            return [
+                'success' => false,
+                'errors' => ['Email não verificado. Verifique sua caixa de entrada e clique no link de confirmação.'],
+                'email_nao_verificado' => true,
+                'email' => $usuario->email,
             ];
         }
 
@@ -331,6 +360,102 @@ class AuthService
             return [
                 'success' => false,
                 'errors' => ['Erro ao alterar senha: ' . $e->getMessage()],
+            ];
+        }
+    }
+
+    /**
+     * Verificar email com token
+     */
+    public function verificarEmail(string $token): array
+    {
+        // Buscar usuário pelo token
+        $usuario = $this->usuarioRepo->findByVerificationToken($token);
+
+        if (!$usuario) {
+            return [
+                'success' => false,
+                'errors' => ['Token inválido ou expirado'],
+            ];
+        }
+
+        // Verificar se token ainda é válido
+        if ($usuario->token_verificacao_expira && strtotime($usuario->token_verificacao_expira) < time()) {
+            return [
+                'success' => false,
+                'errors' => ['Token expirado. Solicite um novo email de verificação'],
+            ];
+        }
+
+        // Marcar email como verificado
+        try {
+            $this->usuarioRepo->markEmailAsVerified($usuario->id);
+
+            return [
+                'success' => true,
+                'message' => 'Email verificado com sucesso! Você já pode fazer login.',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'errors' => ['Erro ao verificar email: ' . $e->getMessage()],
+            ];
+        }
+    }
+
+    /**
+     * Reenviar email de verificação
+     */
+    public function reenviarEmailVerificacao(string $email): array
+    {
+        $usuario = $this->usuarioRepo->findByEmail(strtolower(trim($email)));
+
+        if (!$usuario) {
+            // Por segurança, retornar sucesso mesmo se email não existir
+            return [
+                'success' => true,
+                'message' => 'Se o email estiver cadastrado e não verificado, você receberá um novo link de verificação',
+            ];
+        }
+
+        // Se já verificado, não reenviar
+        if ($usuario->email_verificado) {
+            return [
+                'success' => false,
+                'errors' => ['Este email já foi verificado'],
+            ];
+        }
+
+        // Gerar novo token
+        $novoToken = bin2hex(random_bytes(32));
+        $expira = date('Y-m-d H:i:s', strtotime('+24 hours'));
+
+        $usuario->token_verificacao = $novoToken;
+        $usuario->token_verificacao_expira = $expira;
+
+        try {
+            $this->usuarioRepo->update($usuario);
+
+            // Enviar email
+            $emailService = new EmailService();
+            $enviado = $emailService->enviarEmailVerificacao(
+                $usuario->email,
+                $usuario->nome,
+                $novoToken
+            );
+
+            if (!$enviado) {
+                error_log("Falha ao enviar email de verificação para: {$usuario->email}");
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Se o email estiver cadastrado e não verificado, você receberá um novo link de verificação',
+            ];
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'errors' => ['Erro ao processar solicitação: ' . $e->getMessage()],
             ];
         }
     }

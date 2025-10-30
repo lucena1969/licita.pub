@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Email - Licita.pub</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1351b4;
+            margin-bottom: 30px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1351b4;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 30px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #666;
+        }
+
+        .success {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .error {
+            color: #ef4444;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 20px 0;
+        }
+
+        .icon {
+            font-size: 4rem;
+            margin: 20px 0;
+        }
+
+        .icon-success {
+            color: #10b981;
+        }
+
+        .icon-error {
+            color: #ef4444;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: #1351b4;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0c326f;
+        }
+
+        .btn-secondary {
+            background-color: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4b5563;
+        }
+
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .divider {
+            margin: 20px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">Licita.pub</div>
+
+        <div id="loading" style="display: block;">
+            <div class="spinner"></div>
+            <div class="message">Verificando seu email...</div>
+        </div>
+
+        <div id="success" style="display: none;">
+            <div class="icon icon-success">✓</div>
+            <div class="success">Email verificado com sucesso!</div>
+            <p class="message">Seu cadastro foi confirmado. Você já pode fazer login e começar a usar a plataforma.</p>
+            <p class="message" style="margin-top: 10px; font-size: 0.9rem;">Você será redirecionado para a página de login em <span id="contador">5</span> segundos...</p>
+            <div class="buttons">
+                <a href="/frontend/login.html" class="btn">Fazer Login Agora</a>
+            </div>
+        </div>
+
+        <div id="error" style="display: none;">
+            <div class="icon icon-error">✗</div>
+            <div class="error">Erro na verificação</div>
+            <p class="message" id="error-message"></p>
+            <div class="divider"></div>
+            <p class="message" style="font-size: 0.9rem;">Você pode solicitar um novo email de verificação:</p>
+            <div class="buttons">
+                <a href="/frontend/cadastro.html" class="btn btn-secondary">Voltar para Cadastro</a>
+                <a href="/frontend/login.html" class="btn">Tentar Login</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Obter token da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const token = urlParams.get('token');
+
+        if (!token) {
+            mostrarErro('Token não fornecido. Verifique o link no email.');
+        } else {
+            verificarEmail(token);
+        }
+
+        async function verificarEmail(token) {
+            try {
+                const response = await fetch(`/api/auth/verificar-email.php?token=${encodeURIComponent(token)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    mostrarSucesso(data.message);
+                } else {
+                    const mensagemErro = data.errors && data.errors.length > 0
+                        ? data.errors.join(', ')
+                        : 'Não foi possível verificar o email. Tente novamente.';
+                    mostrarErro(mensagemErro);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                mostrarErro('Erro ao conectar com o servidor. Tente novamente mais tarde.');
+            }
+        }
+
+        function mostrarSucesso(mensagem) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+
+            // Redirecionar após 5 segundos
+            let contador = 5;
+            const contadorEl = document.getElementById('contador');
+
+            const intervalo = setInterval(() => {
+                contador--;
+                contadorEl.textContent = contador;
+
+                if (contador <= 0) {
+                    clearInterval(intervalo);
+                    window.location.href = '/frontend/login.html';
+                }
+            }, 1000);
+        }
+
+        function mostrarErro(mensagem) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = mensagem;
+        }
+    </script>
+</body>
+</html>
