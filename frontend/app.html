@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licita.pub - Plataforma de Licitações e Preços</title>
+    <meta name="description" content="Consulte licitações e preços praticados pelo governo brasileiro">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="header">
+        <div class="header-container">
+            <div class="logo">
+                <i class="fas fa-file-contract"></i>
+                Licita.pub
+            </div>
+
+            <div class="user-info">
+                <span class="user-name" id="userName">Carregando...</span>
+                <button class="btn-logout" id="btnLogout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Barra de Limite de Consultas -->
+    <div class="limite-bar" id="limiteBar">
+        <div class="limite-container">
+            <div class="limite-info">
+                Consultas restantes: <span class="limite-count" id="limiteCount">--</span>
+            </div>
+            <div class="limite-renova">
+                Renova em: <span id="limiteRenova">--</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container Principal com Sidebar -->
+    <div class="app-container">
+        <!-- Menu Lateral -->
+        <aside class="sidebar" id="sidebar">
+            <nav class="sidebar-nav">
+                <!-- Seção: Consultas -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-search"></i>
+                        Consultas
+                    </div>
+                    <ul class="nav-items">
+                        <li>
+                            <a href="#/licitacoes" class="nav-item" data-route="licitacoes">
+                                <i class="fas fa-file-contract"></i>
+                                <span>Licitações</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/precos" class="nav-item" data-route="precos">
+                                <i class="fas fa-dollar-sign"></i>
+                                <span>Pesquisa de Preços</span>
+                                <span class="badge badge-new">Novo</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/contratos" class="nav-item disabled" data-route="contratos">
+                                <i class="fas fa-file-signature"></i>
+                                <span>Contratos</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/orgaos" class="nav-item disabled" data-route="orgaos">
+                                <i class="fas fa-building"></i>
+                                <span>Órgãos</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Seção: Minha Conta -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-user"></i>
+                        Minha Conta
+                    </div>
+                    <ul class="nav-items">
+                        <li>
+                            <a href="#/favoritos" class="nav-item disabled" data-route="favoritos">
+                                <i class="fas fa-star"></i>
+                                <span>Favoritos</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/alertas" class="nav-item disabled" data-route="alertas">
+                                <i class="fas fa-bell"></i>
+                                <span>Alertas</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/historico" class="nav-item disabled" data-route="historico">
+                                <i class="fas fa-history"></i>
+                                <span>Histórico</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Seção: Configurações -->
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <i class="fas fa-cog"></i>
+                        Configurações
+                    </div>
+                    <ul class="nav-items">
+                        <li>
+                            <a href="#/perfil" class="nav-item disabled" data-route="perfil">
+                                <i class="fas fa-user-circle"></i>
+                                <span>Meu Perfil</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#/planos" class="nav-item disabled" data-route="planos">
+                                <i class="fas fa-crown"></i>
+                                <span>Planos</span>
+                                <span class="badge badge-soon">Em breve</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Botão Toggle Mobile -->
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </aside>
+
+        <!-- Área de Conteúdo Principal -->
+        <main class="main-content" id="mainContent">
+            <!-- Conteúdo será carregado dinamicamente aqui -->
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Carregando...</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Módulos de páginas -->
+    <script src="js/modules/licitacoes.js"></script>
+    <script src="js/modules/precos.js"></script>
+</body>
+</html>

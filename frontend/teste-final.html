@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Teste Final - Licita.pub</title>
+    <style>
+        body {
+            font-family: monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+        }
+        .section {
+            background: #111;
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        button {
+            background: #0f0;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+        }
+        button:hover { background: #0c0; }
+        .success { color: #0f0; }
+        .error { color: #f00; }
+        .info { color: #0cf; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border: 1px solid #333;
+            overflow-x: auto;
+        }
+        input {
+            padding: 8px;
+            width: 250px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 TESTE FINAL - Diagnóstico Completo</h1>
+
+    <div class="section">
+        <h2>PASSO 1: Verificar se api.js foi atualizado</h2>
+        <button onclick="checkApiJS()">Verificar api.js</button>
+        <pre id="result1"></pre>
+    </div>
+
+    <div class="section">
+        <h2>PASSO 2: Fazer Login Completo</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="senha" placeholder="Senha">
+        <button onclick="fazerLogin()">Login Completo</button>
+        <pre id="result2"></pre>
+    </div>
+
+    <div class="section">
+        <h2>PASSO 3: Verificar Session após Login</h2>
+        <button onclick="verificarSession()">Verificar</button>
+        <pre id="result3"></pre>
+    </div>
+
+    <div class="section">
+        <h2>PASSO 4: Testar /auth/me.php com Session</h2>
+        <button onclick="testarAuthMe()">Testar</button>
+        <pre id="result4"></pre>
+    </div>
+
+    <div class="section">
+        <h2>PASSO 5: Simular o que app.js faz</h2>
+        <button onclick="simularApp()">Simular</button>
+        <pre id="result5"></pre>
+    </div>
+
+    <script src="js/api.js"></script>
+
+    <script>
+        // PASSO 1: Verificar se api.js foi atualizado
+        function checkApiJS() {
+            const result = document.getElementById('result1');
+
+            let output = '';
+
+            // Verificar se objeto api existe
+            if (typeof api === 'undefined') {
+                output += '<span class="error">✗ api object NÃO EXISTE!</span>\n';
+                result.innerHTML = output;
+                return;
+            }
+
+            output += '<span class="success">✓ api object existe</span>\n\n';
+
+            // Verificar baseURL
+            output += '<span class="info">baseURL:</span>\n';
+            output += api.baseURL + '\n\n';
+
+            // Verificar se tem /public/ no caminho
+            if (api.baseURL.includes('/public/')) {
+                output += '<span class="success">✓ baseURL contém /public/ - CORRETO!</span>\n';
+            } else {
+                output += '<span class="error">✗ baseURL NÃO contém /public/ - ARQUIVO NÃO FOI ATUALIZADO!</span>\n';
+            }
+
+            // Verificar métodos
+            output += '\n<span class="info">Métodos disponíveis:</span>\n';
+            output += `  - get: ${typeof api.get === 'function' ? '✓' : '✗'}\n`;
+            output += `  - post: ${typeof api.post === 'function' ? '✓' : '✗'}\n`;
+            output += `  - me: ${typeof api.me === 'function' ? '✓' : '✗'}\n`;
+            output += `  - login: ${typeof api.login === 'function' ? '✓' : '✗'}\n`;
+
+            result.innerHTML = output;
+        }
+
+        // PASSO 2: Fazer Login Completo
+        async function fazerLogin() {
+            const result = document.getElementById('result2');
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+
+            if (!email || !senha) {
+                result.innerHTML = '<span class="error">✗ Preencha email e senha</span>';
+                return;
+            }
+
+            result.innerHTML = '<span class="info">⏳ Fazendo login...</span>';
+
+            try {
+                // Limpar session antiga
+                localStorage.removeItem('session_id');
+
+                // Fazer login
+                const response = await api.login(email, senha);
+
+                let output = '<span class="info">Resposta do login:</span>\n';
+                output += JSON.stringify(response, null, 2) + '\n\n';
+
+                if (response.success && response.data) {
+                    if (response.data.session_id) {
+                        output += '<span class="success">✓ Session ID recebido!</span>\n';
+                        output += `Session: ${response.data.session_id.substring(0, 50)}...\n\n`;
+
+                        // Verificar se foi salvo
+                        const saved = localStorage.getItem('session_id');
+                        if (saved) {
+                            output += '<span class="success">✓ Session ID FOI SALVO no localStorage!</span>\n';
+                        } else {
+                            output += '<span class="error">✗ Session ID NÃO FOI SALVO no localStorage!</span>\n';
+                        }
+                    } else {
+                        output += '<span class="error">✗ Session ID não veio na resposta</span>\n';
+                    }
+                } else {
+                    output += '<span class="error">✗ Login falhou!</span>\n';
+                }
+
+                result.innerHTML = output;
+
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Erro: ${error.message}</span>`;
+            }
+        }
+
+        // PASSO 3: Verificar Session
+        function verificarSession() {
+            const result = document.getElementById('result3');
+
+            const sessionId = localStorage.getItem('session_id');
+
+            if (sessionId) {
+                result.innerHTML = `
+<span class="success">✓ Session ID encontrado!</span>
+
+<span class="info">Session (primeiros 100 chars):</span>
+${sessionId.substring(0, 100)}...
+
+<span class="info">Tamanho:</span> ${sessionId.length} caracteres
+                `;
+            } else {
+                result.innerHTML = '<span class="error">✗ Session ID NÃO encontrado no localStorage</span>';
+            }
+        }
+
+        // PASSO 4: Testar /auth/me.php com Session
+        async function testarAuthMe() {
+            const result = document.getElementById('result4');
+            result.innerHTML = '<span class="info">⏳ Testando...</span>';
+
+            const sessionId = localStorage.getItem('session_id');
+
+            if (!sessionId) {
+                result.innerHTML = '<span class="error">✗ Faça login primeiro (PASSO 2)</span>';
+                return;
+            }
+
+            try {
+                const response = await api.me();
+
+                let output = '<span class="info">Resposta de api.me():</span>\n';
+                output += JSON.stringify(response, null, 2) + '\n\n';
+
+                if (response.success && response.data && response.data.success) {
+                    output += '<span class="success">✓ API retornou sucesso!</span>\n';
+                    output += '<span class="success">✓ Usuário autenticado!</span>\n';
+                } else {
+                    output += '<span class="error">✗ API retornou erro</span>\n';
+                }
+
+                result.innerHTML = output;
+
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Erro: ${error.message}</span>`;
+            }
+        }
+
+        // PASSO 5: Simular o que app.js faz
+        async function simularApp() {
+            const result = document.getElementById('result5');
+            result.innerHTML = '<span class="info">⏳ Simulando checkAuth() do app.js...</span>';
+
+            try {
+                const response = await api.me();
+
+                let output = '<span class="info">Simulando app.js:</span>\n\n';
+                output += '1. Chamou api.me()\n';
+                output += `2. Recebeu: ${JSON.stringify(response, null, 2)}\n\n`;
+
+                if (response.success && response.data && response.data.success) {
+                    const usuario = response.data.usuario || response.data.data;
+                    output += '<span class="success">✓ Autenticação OK!</span>\n';
+                    output += `✓ Usuário: ${usuario?.nome || usuario?.email}\n`;
+                    output += '\n<span class="success">➜ app.html DEVE FUNCIONAR!</span>\n';
+                } else {
+                    output += '<span class="error">✗ Autenticação FALHOU</span>\n';
+                    output += '\n<span class="error">➜ Por isso redireciona para login</span>\n';
+                }
+
+                result.innerHTML = output;
+
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Erro: ${error.message}</span>\n\n<span class="error">➜ Por isso redireciona para login</span>`;
+            }
+        }
+
+        // Auto-executar PASSO 1
+        window.addEventListener('DOMContentLoaded', () => {
+            checkApiJS();
+        });
+    </script>
+</body>
+</html>

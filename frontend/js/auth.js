@@ -79,12 +79,22 @@ class AuthService {
     async login(email, senha) {
         const response = await api.login(email, senha);
 
-        if (response.success && response.data.success) {
-            this.usuario = response.data.usuario;
-            return {
-                success: true,
-                usuario: this.usuario,
-            };
+        if (response.success && response.data) {
+            // Verificar se tem session_id na resposta
+            if (response.data.session_id) {
+                // Salvar session_id no localStorage
+                api.saveSessionId(response.data.session_id);
+            }
+
+            // Salvar dados do usuário
+            if (response.data.success) {
+                this.usuario = response.data.usuario;
+                return {
+                    success: true,
+                    usuario: this.usuario,
+                    data: response.data
+                };
+            }
         }
 
         return response;
@@ -113,7 +123,7 @@ class AuthService {
     /**
      * Redirecionar se já autenticado
      */
-    redirectIfAuthenticated(redirectTo = '/consultas.html') {
+    redirectIfAuthenticated(redirectTo = '/frontend/app.html') {
         if (this.isAuthenticated()) {
             window.location.href = redirectTo;
         }

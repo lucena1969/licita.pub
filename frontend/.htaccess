@@ -1,0 +1,26 @@
+# Frontend .htaccess - Licita.pub
+# Configuração para a pasta frontend
+
+# Desabilitar mod_rewrite herdado da raiz
+RewriteEngine Off
+
+# Permitir acesso direto a todos os arquivos
+Options -Indexes +FollowSymLinks
+
+# Garantir Content-Type correto
+AddType text/html .html
+AddType text/css .css
+AddType application/javascript .js
+AddType application/json .json
+
+# Não redirecionar nada - servir arquivos diretamente
+<FilesMatch "\.(html|css|js|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "public, max-age=3600"
+</FilesMatch>
+
+# Permitir CORS para desenvolvimento
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

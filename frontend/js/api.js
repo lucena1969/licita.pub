@@ -1,12 +1,19 @@
 /**
  * Serviço de API - Licita.pub
  * Cliente para comunicação com a API REST
+ *
+ * VERSÃO: 2.0 - CORRIGIDO
+ * DATA: 2025-11-04
  */
 
 class ApiService {
     constructor() {
         // Ajustar baseURL conforme ambiente
         this.baseURL = this.getBaseURL();
+
+        // Marcador de versão para debug
+        this.version = '2.0-CORRIGIDO';
+        console.log('API Service v' + this.version + ' carregado');
     }
 
     /**
@@ -17,16 +24,16 @@ class ApiService {
 
         // Produção
         if (hostname === 'licita.pub' || hostname === 'www.licita.pub') {
-            return 'https://licita.pub/backend/api';
+            return 'https://licita.pub/backend/public/api';
         }
 
         // Desenvolvimento local
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost/backend/api';
+            return 'http://localhost/backend/public/api';
         }
 
         // Fallback
-        return '/backend/api';
+        return '/backend/public/api';
     }
 
     /**
@@ -144,6 +151,25 @@ class ApiService {
         this.removeSessionId();
 
         return response;
+    }
+
+    // ==================== MÉTODOS AUXILIARES ====================
+
+    /**
+     * GET request
+     */
+    async get(endpoint) {
+        return await this.request(endpoint, { method: 'GET' });
+    }
+
+    /**
+     * POST request
+     */
+    async post(endpoint, body = {}) {
+        return await this.request(endpoint, {
+            method: 'POST',
+            body: body,
+        });
     }
 
     // ==================== ENDPOINTS DE LICITAÇÕES ====================

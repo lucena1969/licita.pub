@@ -121,41 +121,65 @@ class PNCPService
      */
     private function processarLicitacao(array $item): void
     {
-        try {
-            // Verificar se já existe
-            $pncpId = $item['numeroControlePNCP'] ?? $item['numeroControlePncpCompra'] ?? $item['numeroCompra'] ?? $item['id'] ?? null;
+        $maxRetries = 2;
+        $retryCount = 0;
 
-            if (!$pncpId) {
+        while ($retryCount <= $maxRetries) {
+            try {
+                // Verificar se já existe
+                $pncpId = $item['numeroControlePNCP'] ?? $item['numeroControlePncpCompra'] ?? $item['numeroCompra'] ?? $item['id'] ?? null;
+
+                if (!$pncpId) {
+                    $this->stats['erros']++;
+                    echo "  ✗ Licitação sem ID\n";
+                    return;
+                }
+
+                // Garantir que o órgão existe
+                $orgaoId = $item['unidadeOrgao']['codigoUnidade'] ?? $item['codigoUnidadeCompradora'] ?? $item['orgaoId'] ?? null;
+
+                if ($orgaoId) {
+                    $this->garantirOrgao($orgaoId, $item);
+                }
+
+                // Mapear dados do PNCP para o modelo
+                $licitacao = $this->mapearLicitacaoDoPNCP($item);
+
+                // UPSERT: Inserir se novo, atualizar se existente
+                // Retorna: ['inserido' => bool, 'licitacao' => Licitacao]
+                $resultado = $this->licitacaoRepo->upsert($licitacao);
+
+                if ($resultado['inserido']) {
+                    $this->stats['novos']++;
+                    echo "  ✓ Nova: {$pncpId}\n";
+                } else {
+                    $this->stats['atualizados']++;
+                    echo "  ↻ Atualizada: {$pncpId}\n";
+                }
+
+                // Sucesso - sair do loop
+                return;
+
+            } catch (Exception $e) {
+                $errorMsg = $e->getMessage();
+
+                // Se for erro de conexão MySQL, tentar novamente
+                if (strpos($errorMsg, 'MySQL server has gone away') !== false ||
+                    strpos($errorMsg, 'Lost connection') !== false) {
+
+                    $retryCount++;
+                    if ($retryCount <= $maxRetries) {
+                        echo "  ⚠ Conexão perdida. Tentativa {$retryCount}/{$maxRetries}...\n";
+                        usleep(500000); // Aguardar 0.5 segundo antes de retry
+                        continue;
+                    }
+                }
+
+                // Erro definitivo
                 $this->stats['erros']++;
-                echo "  ✗ Licitação sem ID\n";
+                echo "  ✗ Erro: {$errorMsg}\n";
                 return;
             }
-
-            // Garantir que o órgão existe
-            $orgaoId = $item['unidadeOrgao']['codigoUnidade'] ?? $item['codigoUnidadeCompradora'] ?? $item['orgaoId'] ?? null;
-
-            if ($orgaoId) {
-                $this->garantirOrgao($orgaoId, $item);
-            }
-
-            // Mapear dados do PNCP para o modelo
-            $licitacao = $this->mapearLicitacaoDoPNCP($item);
-
-            // UPSERT: Inserir se novo, atualizar se existente
-            // Retorna: ['inserido' => bool, 'licitacao' => Licitacao]
-            $resultado = $this->licitacaoRepo->upsert($licitacao);
-
-            if ($resultado['inserido']) {
-                $this->stats['novos']++;
-                echo "  ✓ Nova: {$pncpId}\n";
-            } else {
-                $this->stats['atualizados']++;
-                echo "  ↻ Atualizada: {$pncpId}\n";
-            }
-
-        } catch (Exception $e) {
-            $this->stats['erros']++;
-            echo "  ✗ Erro: " . $e->getMessage() . "\n";
         }
     }
 
