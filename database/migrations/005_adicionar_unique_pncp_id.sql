@@ -1,5 +1,5 @@
 -- ============================================================================
--- Migration 004: Adicionar índice UNIQUE em pncp_id
+-- Migration 005: Adicionar índice UNIQUE em pncp_id
 -- ============================================================================
 -- Data: 28/10/2025
 -- Descrição: Garante que não haja duplicatas de licitações do PNCP
@@ -10,7 +10,7 @@
 --     php backend/database/limpar_duplicatas.php (se houver duplicatas)
 --
 -- Execução:
---   mysql -u u590097272_neto -p u590097272_licitapub < backend/database/migrations/004_adicionar_unique_pncp_id.sql
+--   mysql -u u590097272_neto -p u590097272_licitapub < database/migrations/005_adicionar_unique_pncp_id.sql
 -- ============================================================================
 
 -- Usar o banco correto
@@ -144,7 +144,7 @@ FROM licitacoes;
 
 SELECT '' AS '';
 SELECT '============================================================' AS '';
-SELECT '✅ MIGRATION 004 CONCLUÍDA COM SUCESSO!' AS '';
+SELECT '✅ MIGRATION 005 CONCLUÍDA COM SUCESSO!' AS '';
 SELECT '============================================================' AS '';
 SELECT '' AS '';
 SELECT '📝 Próximos passos:' AS '';

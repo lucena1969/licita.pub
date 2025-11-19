@@ -71,7 +71,7 @@ class PNCPService
                 echo "Sincronizando página {$paginaAtual} de {$totalPaginas}...\n";
 
                 $params['pagina'] = $paginaAtual;
-                $response = $this->fazerRequisicao('/contratos', $params);
+                $response = $this->fazerRequisicao('/contratacoes/publicacao', $params);
 
                 if (!$response || empty($response['data'])) {
                     echo "Nenhum dado retornado na página {$paginaAtual}\n";
@@ -218,13 +218,13 @@ class PNCPService
         $licitacao->numero = $item['numeroContratoEmpenho'] ?? $item['numeroProcesso'] ?? $item['numero'] ?? $licitacao->pncp_id;
         $licitacao->objeto = $item['objetoContrato'] ?? $item['objeto'] ?? $item['descricao'] ?? '';
         $licitacao->modalidade = $this->mapearModalidade($item['tipoContrato']['id'] ?? $item['codigoModalidade'] ?? $item['modalidade'] ?? 0);
-        $licitacao->situacao = 'ATIVO'; // Contratos geralmente estão ativos
+        $licitacao->situacao = $this->mapearSituacao($item['situacao'] ?? $item['situacaoContratacao'] ?? 'ATIVA');
         $licitacao->valor_estimado = $item['valorGlobal'] ?? $item['valorInicial'] ?? $item['valorEstimado'] ?? $item['valor'] ?? null;
 
         // Datas
         $licitacao->data_publicacao = $this->formatarData($item['dataPublicacaoPncp'] ?? $item['dataPublicacao'] ?? date('Y-m-d'));
         $licitacao->data_abertura = $this->formatarData($item['dataAssinatura'] ?? $item['dataAberturaProposta'] ?? $item['dataAbertura'] ?? null);
-        $licitacao->data_encerramento = $this->formatarData($item['dataVigenciaFim'] ?? $item['dataEncerramentoProposta'] ?? $item->dataEncerramento ?? null);
+        $licitacao->data_encerramento = $this->formatarData($item['dataVigenciaFim'] ?? $item['dataEncerramentoProposta'] ?? $item['dataEncerramento'] ?? null);
 
         // Localização
         $licitacao->uf = strtoupper($item['unidadeOrgao']['ufSigla'] ?? $item['uf'] ?? $item['unidadeFederacao'] ?? 'SP');

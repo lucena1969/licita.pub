@@ -16,6 +16,7 @@
 -- 002 → Contratos (depende de órgãos e licitações)
 -- 003 → Atas de Registro de Preço (depende de órgãos e licitações)
 -- 004 → Planos de Contratação Anual (depende de órgãos)
+-- 005 → Índice UNIQUE em pncp_id (CRÍTICO para UPSERT)
 --
 -- ============================================================
 
@@ -88,6 +89,19 @@ SELECT '==================================================' AS '';
 SOURCE 004_criar_tabela_planos_contratacao_anual.sql;
 
 SELECT 'MIGRAÇÃO 004 CONCLUÍDA!' AS status;
+DO SLEEP(1);
+
+-- ============================================================
+-- MIGRAÇÃO 005: ÍNDICE UNIQUE EM PNCP_ID
+-- ============================================================
+
+SELECT '==================================================' AS '';
+SELECT 'INICIANDO MIGRAÇÃO 005: ÍNDICE UNIQUE EM PNCP_ID' AS status;
+SELECT '==================================================' AS '';
+
+SOURCE 005_adicionar_unique_pncp_id.sql;
+
+SELECT 'MIGRAÇÃO 005 CONCLUÍDA!' AS status;
 DO SLEEP(1);
 
 -- ============================================================

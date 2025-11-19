@@ -249,7 +249,7 @@ const LicitacoesModule = {
 
         // Renderizar itens
         const itemsHTML = this.state.licitacoes.map(lic => `
-            <div class="item" onclick="LicitacoesModule.verDetalhes('${lic.id}')">
+            <div class="item" onclick="LicitacoesModule.verDetalhes('${lic.pncp_id}')">
                 <div class="item-header">
                     <span class="item-title">${lic.numero || lic.pncp_id}</span>
                     <span class="status-badge status-${lic.situacao?.toLowerCase() || 'active'}">

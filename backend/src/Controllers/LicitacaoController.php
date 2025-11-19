@@ -121,6 +121,8 @@ class LicitacaoController
             $modalidade = $_GET['modalidade'] ?? null;
             $palavraChave = $_GET['q'] ?? null;
             $situacao = $_GET['situacao'] ?? null;
+            $dataAbertura = $_GET['data_abertura'] ?? null;
+            $dataPublicacao = $_GET['data_publicacao'] ?? null;
 
             // Paginação
             $pagina = max(1, (int)($_GET['pagina'] ?? 1));
@@ -157,6 +159,16 @@ class LicitacaoController
                     LOWER(numero) LIKE LOWER(:q)
                 )";
                 $params[':q'] = "%$palavraChave%";
+            }
+
+            if ($dataAbertura) {
+                $where[] = "DATE(data_abertura) >= :data_abertura";
+                $params[':data_abertura'] = $dataAbertura;
+            }
+
+            if ($dataPublicacao) {
+                $where[] = "DATE(data_publicacao) >= :data_publicacao";
+                $params[':data_publicacao'] = $dataPublicacao;
             }
 
             $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -210,7 +222,9 @@ class LicitacaoController
                     'municipio' => $municipio,
                     'modalidade' => $modalidade,
                     'palavra_chave' => $palavraChave,
-                    'situacao' => $situacao
+                    'situacao' => $situacao,
+                    'data_abertura' => $dataAbertura,
+                    'data_publicacao' => $dataPublicacao
                 ],
                 'paginacao' => [
                     'pagina' => $pagina,
