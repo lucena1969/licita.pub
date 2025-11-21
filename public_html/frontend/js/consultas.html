@@ -1,0 +1,1977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licitações - Licita.pub</title>
+    <meta name="description" content="Consulte licitações públicas de todo o Brasil.">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Estilos específicos para a página de licitações */
+        .filtros-container {
+            background-color: white;
+            border: 1px solid #d4d4d4;
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .filtros-header {
+            margin-bottom: 15px;
+        }
+
+        .filtros-title {
+            font-size: 1.1rem;
+            color: #1351b4;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-input, .form-select {
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.9rem;
+            background-color: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #1351b4;
+        }
+
+        .filtros-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .licitacao-item {
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .licitacao-item:hover {
+            background-color: #f8f8f8;
+        }
+
+        .licitacao-item:last-child {
+            border-bottom: none;
+        }
+
+        .licitacao-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .licitacao-numero {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1351b4;
+        }
+
+        .licitacao-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background-color: #e8f0fe;
+            color: #1351b4;
+        }
+
+        .licitacao-objeto {
+            font-size: 0.9rem;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .licitacao-info {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .licitacao-info span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Botão Comparar Preços */
+        .btn-comparar-precos {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-comparar-precos:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        }
+
+        .btn-comparar-precos:active {
+            transform: translateY(0);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 9998;
+            animation: fadeIn 0.2s;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            z-index: 9999;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        .modal-title {
+            font-size: 1.4rem;
+            color: #333;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-produto {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .modal-produto-titulo {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .modal-produto-preco {
+            font-size: 1.8rem;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .modal-lojas-titulo {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .modal-lojas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .modal-loja-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 18px;
+            background: white;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .modal-loja-link:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .modal-loja-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-loja-icon {
+            font-size: 1.3rem;
+        }
+
+        .modal-loja-nome {
+            font-size: 0.95rem;
+        }
+
+        /* Estilos para Produtos Capturados */
+        .produto-capturado {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            align-items: center;
+            background: white;
+            transition: all 0.2s ease;
+        }
+
+        .produto-capturado:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+
+        .produto-capturado input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .produto-capturado img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .produto-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .produto-titulo {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .produto-preco {
+            font-size: 1.1rem;
+            color: #27ae60;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .produto-fonte {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .produto-fonte .frete-gratis {
+            color: #27ae60;
+            font-weight: 500;
+        }
+
+        .margem-badge {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .margem-positiva {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .margem-negativa {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .margem-neutra {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        #acoes-capturados {
+            display: flex;
+        }
+
+        .analise-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .analise-item {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .analise-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .analise-valor {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .recomendacao {
+            background: #e3f2fd;
+            padding: 12px 15px;
+            border-radius: 6px;
+            color: #1565c0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-gavel"></i>
+                    <span>Licita.pub</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu" title="Fechar menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Principal</div>
+                    <ul class="nav-list">
+                        <li><a href="/frontend/app.html" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                        <li><a href="/frontend/consultas.html" class="nav-item active"><i class="fas fa-file-contract"></i><span>Licitações</span></a></li>
+                        <li><a href="/frontend/inteligencia-precos.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Inteligência de Preços</span></a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Minha Conta</div>
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menu" title="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title"><i class="fas fa-file-contract"></i> Licitações</h1>
+                <div class="user-info"><i class="fas fa-user-circle"></i><span id="userName">Usuário</span></div>
+            </header>
+
+            <div class="content-body">
+            <div class="content-wrapper">
+                <!-- Filtros -->
+                <div class="filtros-container">
+                    <div class="filtros-header">
+                        <h2 class="filtros-title">
+                            <i class="fas fa-filter"></i>
+                            Filtrar Licitações
+                        </h2>
+                    </div>
+                    <form id="form-filtros">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label" for="busca">Palavra-chave</label>
+                                <input type="text" class="form-input" id="busca" name="busca" placeholder="Ex: computador, serviço, obra">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="uf">Estado (UF)</label>
+                                <select class="form-select" id="uf" name="uf">
+                                    <option value="">Todos os estados</option>
+                                    <option value="AC">Acre</option>
+                                    <option value="AL">Alagoas</option>
+                                    <option value="AP">Amapá</option>
+                                    <option value="AM">Amazonas</option>
+                                    <option value="BA">Bahia</option>
+                                    <option value="CE">Ceará</option>
+                                    <option value="DF">Distrito Federal</option>
+                                    <option value="ES">Espírito Santo</option>
+                                    <option value="GO">Goiás</option>
+                                    <option value="MA">Maranhão</option>
+                                    <option value="MT">Mato Grosso</option>
+                                    <option value="MS">Mato Grosso do Sul</option>
+                                    <option value="MG">Minas Gerais</option>
+                                    <option value="PA">Pará</option>
+                                    <option value="PB">Paraíba</option>
+                                    <option value="PR">Paraná</option>
+                                    <option value="PE">Pernambuco</option>
+                                    <option value="PI">Piauí</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="RN">Rio Grande do Norte</option>
+                                    <option value="RS">Rio Grande do Sul</option>
+                                    <option value="RO">Rondônia</option>
+                                    <option value="RR">Roraima</option>
+                                    <option value="SC">Santa Catarina</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="SE">Sergipe</option>
+                                    <option value="TO">Tocantins</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="municipio">Município</label>
+                                <input type="text" class="form-input" id="municipio" name="municipio" placeholder="Ex: São Paulo">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="modalidade">Modalidade</label>
+                                <select class="form-select" id="modalidade" name="modalidade">
+                                    <option value="">Todas as modalidades</option>
+                                    <option value="Pregão Eletrônico">Pregão Eletrônico</option>
+                                    <option value="Pregão Presencial">Pregão Presencial</option>
+                                    <option value="Concorrência">Concorrência</option>
+                                    <option value="Tomada de Preços">Tomada de Preços</option>
+                                    <option value="Convite">Convite</option>
+                                    <option value="Dispensa">Dispensa</option>
+                                    <option value="Inexigibilidade">Inexigibilidade</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="data-abertura-de">Abertura a partir de</label>
+                                <input type="date" class="form-input" id="data-abertura-de" name="data_abertura_de">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="data-publicacao-de">Publicação a partir de</label>
+                                <input type="date" class="form-input" id="data-publicacao-de" name="data_publicacao_de">
+                            </div>
+                        </div>
+                        <div class="filtros-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                                Buscar
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="limparFiltros()">
+                                <i class="fas fa-eraser"></i>
+                                Limpar filtros
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Resultados -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Licitações Encontradas</h2>
+                        <span class="total-resultados" id="total-resultados">--</span>
+                    </div>
+
+                    <div class="card-body">
+                        <div id="lista-licitacoes">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                                <p>Carregando licitações...</p>
+                            </div>
+                        </div>
+
+                        <div class="pagination" id="paginacao" style="display: none;">
+                            <!-- Botões de paginação serão inseridos aqui -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        let paginaAtual = 1;
+        let filtrosAtuais = {};
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Verificar autenticação
+            await checkAuth();
+
+            // Carregar dados do usuário
+            await carregarUsuario();
+
+            // Carregar informações de limite
+            await carregarLimite();
+
+            // Carregar licitações inicial
+            await buscarLicitacoes(1);
+
+            // Inicializar componentes
+            initSidebar();
+            initLogout();
+        });
+
+        // Verificar autenticação
+        async function checkAuth() {
+            try {
+                const sessionId = localStorage.getItem('session_id');
+                if (!sessionId) {
+                    window.location.href = '/frontend/login.html';
+                    return;
+                }
+
+                const response = await api.me();
+                if (!response.success || !response.data || !response.data.usuario) {
+                    window.location.href = '/frontend/login.html';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = '/frontend/login.html';
+            }
+        }
+
+        // Carregar dados do usuário
+        async function carregarUsuario() {
+            const response = await api.me();
+            if (response.success && response.data && response.data.usuario) {
+                document.getElementById('userName').textContent = response.data.usuario.nome;
+            }
+        }
+
+        // Carregar informações de limite
+        async function carregarLimite() {
+            try {
+                const response = await api.request('/licitacoes/limite.php');
+                if (response.success && response.data) {
+                    const info = response.data.info || {};
+                    const restantes = info.restantes || 0;
+                    const limite = info.limite_diario || 0;
+
+                    const limiteCountEl = document.getElementById('limiteCount');
+                    const limiteRenovaEl = document.getElementById('limiteRenova');
+
+                    if (limiteCountEl) {
+                        limiteCountEl.textContent = `${limite - restantes}/${limite}`;
+                    }
+                    if (limiteRenovaEl) {
+                        limiteRenovaEl.textContent = 'Renova em 24h';
+                    }
+                }
+            } catch (error) {
+                console.error('Erro ao carregar limite:', error);
+            }
+        }
+
+        // Buscar licitações
+        async function buscarLicitacoes(pagina = 1) {
+            const listaElement = document.getElementById('lista-licitacoes');
+            listaElement.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Carregando licitações...</p></div>';
+
+            try {
+                const params = new URLSearchParams({
+                    ...filtrosAtuais,
+                    pagina: pagina,
+                    limite: 20
+                });
+
+                const response = await api.request(`/licitacoes/buscar.php?${params}`);
+
+                // response.data contém o payload completo da API
+                // response.data.data contém o array de licitações
+                if (response.success && response.data && response.data.success && Array.isArray(response.data.data)) {
+                    renderizarLicitacoes(response.data.data);
+                    renderizarPaginacao(response.data.paginacao || { pagina: 1, total_paginas: 1, total: 0 });
+                    document.getElementById('total-resultados').textContent = `${response.data.paginacao?.total || 0} resultado(s)`;
+                } else {
+                    listaElement.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>Nenhuma licitação encontrada</h3><p>Tente ajustar os filtros de busca.</p></div>';
+                }
+            } catch (error) {
+                console.error('Erro ao buscar licitações:', error);
+                listaElement.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i><span>Erro ao carregar licitações.</span></div>';
+            }
+        }
+
+        // Renderizar lista de licitações
+        function renderizarLicitacoes(licitacoes) {
+            const listaElement = document.getElementById('lista-licitacoes');
+
+            if (!licitacoes || licitacoes.length === 0) {
+                listaElement.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>Nenhuma licitação encontrada</h3><p>Tente ajustar os filtros de busca.</p></div>';
+                return;
+            }
+
+            listaElement.innerHTML = licitacoes.map(lic => `
+                <div class="licitacao-item">
+                    <div class="licitacao-header">
+                        <div class="licitacao-numero">${lic.numero || lic.pncp_id}</div>
+                        <div class="licitacao-status">${lic.situacao || 'N/D'}</div>
+                    </div>
+                    <div class="licitacao-objeto" onclick="verDetalhes('${lic.pncp_id || lic.id}')" style="cursor: pointer;">
+                        <strong>Objeto:</strong> ${lic.objeto || 'Sem descrição'}
+                    </div>
+                    <div class="licitacao-info">
+                        <span><i class="fas fa-gavel"></i> ${lic.modalidade || 'N/D'}</span>
+                        <span><i class="fas fa-map-marker-alt"></i> ${lic.municipio || 'N/D'}, ${lic.uf || 'N/D'}</span>
+                        ${lic.valor_estimado ? `<span><i class="fas fa-dollar-sign"></i> ${utils.formatarValor(lic.valor_estimado)}</span>` : ''}
+                        <span><i class="fas fa-building"></i> ${lic.nome_orgao || '--'}</span>
+                    </div>
+                    <div class="licitacao-acoes" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e5e5;">
+                        <button class="btn-comparar-precos" onclick="event.stopPropagation(); abrirComparadorPrecos('${(lic.objeto || '').replace(/'/g, "\\'")}', ${lic.valor_estimado || 0})">
+                            <i class="fas fa-search-dollar"></i> Comparar Preços Online
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Renderizar paginação
+        function renderizarPaginacao(paginacao) {
+            const paginacaoElement = document.getElementById('paginacao');
+
+            if (paginacao.total_paginas <= 1) {
+                paginacaoElement.style.display = 'none';
+                return;
+            }
+
+            paginacaoElement.style.display = 'flex';
+
+            let html = `
+                <button class="pagination-btn" onclick="buscarLicitacoes(${paginacao.pagina - 1})" ${paginacao.pagina === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+
+            for (let i = 1; i <= Math.min(paginacao.total_paginas, 10); i++) {
+                html += `<button class="pagination-btn ${i === paginacao.pagina ? 'active' : ''}" onclick="buscarLicitacoes(${i})">${i}</button>`;
+            }
+
+            html += `
+                <button class="pagination-btn" onclick="buscarLicitacoes(${paginacao.pagina + 1})" ${paginacao.pagina === paginacao.total_paginas ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+
+            paginacaoElement.innerHTML = html;
+        }
+
+        // Ver detalhes
+        function verDetalhes(id) {
+            if (!id) {
+                console.error('ID não fornecido');
+                return;
+            }
+            window.location.href = `/frontend/detalhes.html?id=${encodeURIComponent(id)}`;
+        }
+
+        // Limpar filtros
+        function limparFiltros() {
+            document.getElementById('form-filtros').reset();
+            filtrosAtuais = {};
+            paginaAtual = 1;
+            buscarLicitacoes(1);
+        }
+
+        // Submeter formulário de filtros
+        document.getElementById('form-filtros').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            filtrosAtuais = {
+                q: document.getElementById('busca').value.trim(),
+                uf: document.getElementById('uf').value,
+                municipio: document.getElementById('municipio').value.trim(),
+                modalidade: document.getElementById('modalidade').value,
+                data_abertura_de: document.getElementById('data-abertura-de').value,
+                data_publicacao_de: document.getElementById('data-publicacao-de').value
+            };
+
+            // Remover campos vazios
+            Object.keys(filtrosAtuais).forEach(key => {
+                if (!filtrosAtuais[key]) delete filtrosAtuais[key];
+            });
+
+            paginaAtual = 1;
+            buscarLicitacoes(1);
+        });
+
+        // Inicializar sidebar
+        function initSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    sidebar.classList.add('open');
+                });
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+            }
+        }
+
+        // Inicializar logout
+        function initLogout() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await api.logout();
+                        localStorage.removeItem('session_id');
+                        window.location.href = '/frontend/login.html';
+                    } catch (error) {
+                        console.error('Erro ao fazer logout:', error);
+                        localStorage.removeItem('session_id');
+                        window.location.href = '/frontend/login.html';
+                    }
+                });
+            }
+        }
+
+        // ========== COMPARADOR DE PREÇOS ==========
+        async function abrirComparadorPrecos(descricao, valorGoverno) {
+            // Salvar descrição e valor para uso posterior (ex: voltar de CATMAT para keywords)
+            window.currentObjeto = descricao;
+            window.currentObjetoCompleto = descricao;
+            window.modoCatmatDescricao = false;
+            window.descricaoCatmatAtual = null;
+
+            const modal = document.getElementById('modal-comparar-precos');
+            const overlay = document.getElementById('modal-overlay');
+            const modalDescricao = document.getElementById('modal-descricao');
+            const modalPreco = document.getElementById('modal-preco');
+            const linksContainer = document.getElementById('modal-links');
+            const keywordsContainer = document.getElementById('keywords-info');
+
+            // Verificar se elementos existem
+            if (!modalDescricao || !modalPreco || !linksContainer || !keywordsContainer) {
+                console.error('❌ Elementos do modal não encontrados. Limpe o cache (Ctrl+Shift+Del) e faça hard refresh (Ctrl+F5)');
+                alert('❌ Erro ao carregar modal. Pressione Ctrl+F5 para atualizar a página.');
+                return;
+            }
+
+            // Atualizar conteúdo do modal
+            modalDescricao.textContent = descricao;
+            modalPreco.textContent = 'R$ ' + utils.formatarValor(valorGoverno);
+
+            // Mostrar loading nas keywords
+            keywordsContainer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Extraindo palavras-chave inteligentes...';
+
+            // Exibir modal
+            overlay.style.display = 'block';
+            modal.style.display = 'block';
+
+            try {
+                // Extrair keywords usando API inteligente
+                const response = await api.request('/keywords/extrair.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ descricao: descricao })
+                });
+
+                console.log('📊 Resposta completa:', JSON.stringify(response, null, 2));
+
+                if (response.success && response.data) {
+                    // A resposta pode vir como response.data.data ou response.data
+                    const apiData = response.data.data || response.data;
+                    const { keywords, palavras, metadados, sugestoes_catmat } = apiData;
+
+                    console.log('📊 keywords:', keywords);
+                    console.log('📊 palavras:', palavras);
+                    console.log('📊 metadados:', metadados);
+                    console.log('📊 sugestoes_catmat:', sugestoes_catmat);
+
+                    // Validar se palavras existe e é um array
+                    if (!palavras || !Array.isArray(palavras)) {
+                        console.error('❌ palavras inválido:', palavras);
+                        throw new Error('Resposta da API inválida - palavras não é array');
+                    }
+
+                    // Armazenar keywords extraídas globalmente
+                    window.keywordsExtraidas = palavras;
+                    window.sugestoesCatmat = sugestoes_catmat || [];
+
+                    // Renderizar keywords usando função reutilizável
+                    renderizarKeywords(palavras, sugestoes_catmat);
+
+                    // Gerar links para lojas com keywords selecionadas
+                    atualizarLinksBusca();
+
+                } else {
+                    throw new Error('Erro ao extrair keywords');
+                }
+            } catch (error) {
+                console.error('Erro ao extrair keywords:', error);
+
+                // Fallback para extração local
+                const termosBusca = extrairTermosDeBusca(descricao);
+                window.keywordsExtraidas = [];
+
+                keywordsContainer.innerHTML = `
+                    <div style="color: #ff9800;">
+                        ⚠️ Usando extração básica (API indisponível)
+                    </div>
+                `;
+
+                linksContainer.innerHTML = gerarLinksLojas(termosBusca);
+            }
+        }
+
+        function fecharModalComparar() {
+            document.getElementById('modal-comparar-precos').style.display = 'none';
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        function extrairTermosDeBusca(descricao) {
+            console.log('📝 Descrição original:', descricao);
+
+            // 1. PASSO 1: Extrair conteúdo entre aspas (geralmente é o núcleo)
+            const dentroAspas = [];
+            const regexAspas = /"([^"]+)"|"([^"]+)"|'([^']+)'/g;
+            let match;
+            while ((match = regexAspas.exec(descricao)) !== null) {
+                const conteudo = match[1] || match[2] || match[3];
+                if (conteudo && conteudo.length > 3) {
+                    dentroAspas.push(conteudo.toLowerCase());
+                }
+            }
+
+            if (dentroAspas.length > 0) {
+                console.log('✓ Encontrado entre aspas:', dentroAspas);
+            }
+
+            // 2. PASSO 2: Identificar padrões descritivos e extrair o núcleo
+            let nucleoDoObjeto = '';
+            const padrõesDescritivos = [
+                // Padrão: "tem por objetivo [NÚCLEO]"
+                /tem\s+por\s+(?:objeto|objetivo)\s+(?:a\s+)?(?:contrata[çc][aã]o|aquisi[çc][aã]o|presta[çc][aã]o|fornecimento|execu[çc][aã]o)\s+de\s+(.+?)(?:\s+(?:para|visando|de\s+acordo|conforme|,|\.)|$)/i,
+                // Padrão: "visa [NÚCLEO]"
+                /visa\s+(?:a\s+)?(?:contrata[çc][aã]o|aquisi[çc][aã]o|presta[çc][aã]o|fornecimento)\s+de\s+(.+?)(?:\s+(?:para|visando|de\s+acordo|conforme|,|\.)|$)/i,
+                // Padrão: "contratação de [NÚCLEO]"
+                /(?:contrata[çc][aã]o|aquisi[çc][aã]o|presta[çc][aã]o|fornecimento)\s+de\s+(.+?)(?:\s+(?:para|visando|de\s+acordo|conforme|destinad|a\s+ser|,|\.)|$)/i,
+                // Padrão: "registro de preços para [NÚCLEO]"
+                /registro\s+de\s+pre[çc]os?\s+para\s+(?:eventual\s+)?(?:contrata[çc][aã]o|aquisi[çc][aã]o|fornecimento)\s+de\s+(.+?)(?:\s+(?:conforme|de\s+acordo|,|\.)|$)/i,
+                // Padrão: obras de "NÚCLEO"
+                /obras?\s+de\s+["']?([^"',\.]+)["']?/i,
+                // Padrão: serviços de "NÚCLEO"
+                /servi[çc]os?\s+de\s+["']?([^"',\.]+)["']?/i
+            ];
+
+            for (const padrao of padrõesDescritivos) {
+                const resultado = descricao.match(padrao);
+                if (resultado && resultado[1]) {
+                    nucleoDoObjeto = resultado[1].trim();
+                    console.log('✓ Núcleo identificado:', nucleoDoObjeto);
+                    break;
+                }
+            }
+
+            // Se encontrou núcleo OU aspas, usar isso prioritariamente
+            let textoParaProcessar = nucleoDoObjeto || dentroAspas.join(' ') || descricao;
+
+            // 3. PASSO 3: Normalizar e limpar
+            let texto = textoParaProcessar.toLowerCase();
+
+            // Stop words expandidas
+            const stopWords = [
+                'de', 'da', 'do', 'das', 'dos', 'para', 'com', 'sem', 'pelo', 'pela', 'pelos', 'pelas',
+                'ao', 'aos', 'na', 'no', 'nas', 'nos', 'em', 'a', 'o', 'e', 'ou', 'por', 'sob', 'sobre',
+                'lei', 'ata', 'registro', 'precos', 'preços', 'pregao', 'pregão', 'licitacao', 'licitação',
+                'contratacao', 'contratação', 'aquisicao', 'aquisição', 'fornecimento',
+                'servico', 'serviço', 'servicos', 'serviços', 'obra', 'obras',
+                'processo', 'edital', 'objeto', 'item', 'itens', 'diversos', 'diversas',
+                'tipo', 'tipos', 'conforme', 'descricao', 'descrição', 'especificacao', 'especificação',
+                'mediante', 'atraves', 'através', 'eventual', 'eventuais', 'futura', 'futuras', 'futuro', 'futuros',
+                'visando', 'destinado', 'destinada', 'referente', 'relativo', 'relativa',
+                'acordo', 'termos', 'termo', 'condicoes', 'condições', 'anexo', 'anexos',
+                'planilha', 'planilhas', 'memorial', 'descritivo', 'orcamentaria', 'orçamentária',
+                'cronograma', 'projeto', 'referencia', 'referência',
+                'um', 'uma', 'dois', 'duas', 'tres', 'três', 'quatro', 'cinco',
+                'atender', 'realizar', 'executar', 'fornecer', 'prestar', 'instalar', 'instalados',
+                'empresa', 'empresas', 'ramo', 'pertinente', 'execucao', 'execução',
+                'presente', 'serem', 'acordo', 'especificacoes', 'especificações'
+            ];
+
+            // Remover padrões comuns
+            texto = texto
+                .replace(/lei\s+n?º?\s*\d+[\./]\d+/gi, '')
+                .replace(/processo\s+n?º?\s*[\d\-\/\.]+/gi, '')
+                .replace(/edital\s+n?º?\s*[\d\-\/\.]+/gi, '')
+                .replace(/preg[aã]o\s+(eletr[oô]nico\s+)?n?º?\s*[\d\-\/\.]+/gi, '')
+                .replace(/anexo\s+[ivxlcdm]+/gi, '')
+                .replace(/termo\s+de\s+refer[êe]ncia/gi, '')
+                .replace(/\b20\d{2}\b/g, '')
+                .replace(/\b\d{4,}\b/g, '');
+
+            // 4. PASSO 4: Extrair e classificar palavras
+            const palavras = texto
+                .replace(/[^a-záàâãéèêíïóôõöúçñ0-9\s]/g, ' ')
+                .split(/\s+/)
+                .filter(p => p.length >= 3 && !stopWords.includes(p));
+
+            const palavrasImportantes = [];
+            const palavrasComuns = [];
+
+            // Padrões de produtos/serviços conhecidos
+            const padroesProdutos = [
+                // Tecnologia
+                /notebook|laptop|computador|desktop|pc|workstation/i,
+                /impressora|scanner|multifuncional|copiadora/i,
+                /tinta|cartucho|toner|ribbon/i,
+                /tablet|ipad|celular|smartphone/i,
+                /roteador|switch|modem|firewall|access\s*point/i,
+                /projetor|datashow|televisor|monitor/i,
+                /servidor|storage|backup|rack/i,
+                // Mobiliário
+                /cadeira|mesa|armario|arquivo|estante|balcao|escrivaninha/i,
+                /sofa|poltrona|banco|longarina/i,
+                // Material de escritório
+                /papel|sulfite|a4|oficio/i,
+                /caneta|lapis|borracha|grampeador|clips/i,
+                // Vestuário
+                /uniformes?|camiseta|calca|jaleco|avental|sapato|bota/i,
+                // Saúde
+                /medicamento|remedio|farmaco|vacina|soro/i,
+                /equipamento|aparelho|bisturi|estetoscopio/i,
+                // Veículos
+                /veiculo|carro|onibus|caminhao|ambulancia|moto/i,
+                /combustivel|gasolina|diesel|etanol/i,
+                // Alimentação
+                /alimento|merenda|refeicao|cesta|basica/i,
+                // Construção
+                /cimento|areia|brita|tijolo|telha|madeira|ferro/i,
+                /pergolado|cobertura|estrutura|guarita/i,
+                /pavimentacao|asfalto|calcada|calcamento/i,
+                // Limpeza
+                /limpeza|higienizacao|desinfeccao/i,
+                /vassoura|rodo|pano|detergente|sabao/i
+            ];
+
+            // Marcas conhecidas
+            const marcasConhecidas = [
+                'hp', 'dell', 'lenovo', 'asus', 'acer', 'samsung', 'lg', 'apple', 'positivo',
+                'canon', 'epson', 'brother', 'xerox', 'ricoh',
+                'intel', 'amd', 'nvidia', 'cisco',
+                'microsoft', 'windows', 'office', 'adobe'
+            ];
+
+            palavras.forEach(palavra => {
+                // Marcas têm prioridade máxima
+                if (marcasConhecidas.includes(palavra)) {
+                    palavrasImportantes.unshift(palavra);
+                    return;
+                }
+
+                // Produtos conhecidos
+                const ehProdutoConhecido = padroesProdutos.some(padrao => padrao.test(palavra));
+                if (ehProdutoConhecido) {
+                    palavrasImportantes.push(palavra);
+                    return;
+                }
+
+                // Palavras com números (especificações técnicas)
+                if (/\d/.test(palavra) && palavra.length <= 10) {
+                    palavrasImportantes.push(palavra);
+                    return;
+                }
+
+                // Substantivos específicos (6+ caracteres)
+                if (palavra.length >= 6) {
+                    palavrasImportantes.push(palavra);
+                    return;
+                }
+
+                palavrasComuns.push(palavra);
+            });
+
+            // 5. PASSO 5: Montar resultado final
+            const resultado = [
+                ...palavrasImportantes.slice(0, 3),
+                ...palavrasComuns.slice(0, 2)
+            ];
+
+            const termoFinal = resultado.slice(0, 4).join(' ').trim();
+
+            console.log('🎯 Termos extraídos:', termoFinal || 'produto');
+            console.log('---');
+
+            return termoFinal || 'produto';
+        }
+
+        function gerarLinksLojas(termo) {
+            const termoEncoded = encodeURIComponent(termo);
+
+            const lojas = [
+                {
+                    nome: 'Mercado Livre',
+                    icon: 'fas fa-shopping-bag',
+                    url: `https://lista.mercadolivre.com.br/${termoEncoded}`,
+                    cor: '#FFE600'
+                },
+                {
+                    nome: 'Buscapé',
+                    icon: 'fas fa-search-dollar',
+                    url: `https://www.buscape.com.br/search?q=${termoEncoded}`,
+                    cor: '#0066CC'
+                },
+                {
+                    nome: 'Amazon Brasil',
+                    icon: 'fab fa-amazon',
+                    url: `https://www.amazon.com.br/s?k=${termoEncoded}`,
+                    cor: '#FF9900'
+                },
+                {
+                    nome: 'Magazine Luiza',
+                    icon: 'fas fa-store',
+                    url: `https://www.magazineluiza.com.br/busca/${termoEncoded}`,
+                    cor: '#0086FF'
+                }
+            ];
+
+            return lojas.map(loja => `
+                <a href="${loja.url}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="modal-loja-link"
+                   style="border-left: 4px solid ${loja.cor}">
+                    <div class="modal-loja-info">
+                        <i class="${loja.icon} modal-loja-icon" style="color: ${loja.cor}"></i>
+                        <span class="modal-loja-nome">${loja.nome}</span>
+                    </div>
+                    <i class="fas fa-external-link-alt" style="color: #999"></i>
+                </a>
+            `).join('');
+        }
+
+        // Fechar modal ao clicar no overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('modal-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', fecharModalComparar);
+            }
+        });
+
+        // ========== GERENCIAMENTO DE PRODUTOS CAPTURADOS ==========
+        let produtosCapturados = [];
+        let licitacaoAtual = null;
+
+        // Modificar função existente para guardar contexto
+        const abrirComparadorPrecosOriginal = abrirComparadorPrecos;
+        abrirComparadorPrecos = function(descricao, valorGoverno, licitacaoId = null) {
+            // Chamar função original
+            abrirComparadorPrecosOriginal(descricao, valorGoverno);
+
+            // Guardar contexto da licitação
+            licitacaoAtual = {
+                id: licitacaoId,
+                descricao: descricao,
+                valor_governo: valorGoverno
+            };
+
+            // Limpar produtos anteriores
+            produtosCapturados = [];
+            atualizarListaProdutos();
+        };
+
+        // Receber produtos da extensão via postMessage
+        window.addEventListener('message', function(event) {
+            // Validar origem (permitir de qualquer origem para testes, depois restringir)
+            if (event.data && event.data.type === 'PRODUTOS_CAPTURADOS_EXTENSAO') {
+                const produtos = event.data.produtos || [];
+
+                console.log(`📦 Recebidos ${produtos.length} produtos da extensão`);
+                console.log('📊 licitacaoAtual:', licitacaoAtual);
+
+                // Validar se existe contexto da licitação
+                if (!licitacaoAtual) {
+                    console.error('❌ licitacaoAtual está null! Modal pode ter sido fechado.');
+                    alert('❌ Erro: Modal foi fechado. Por favor, abra novamente o modal "Comparar Preços".');
+                    return;
+                }
+
+                // Validar valor_governo
+                const valorGoverno = parseFloat(licitacaoAtual.valor_governo) || 0;
+                if (valorGoverno === 0) {
+                    console.warn('⚠️ valor_governo é 0. Margens não serão calculadas corretamente.');
+                }
+
+                // Adicionar produtos (remover duplicatas)
+                produtos.forEach(produto => {
+                    const jaExiste = produtosCapturados.some(p =>
+                        p.url === produto.url ||
+                        (p.titulo === produto.titulo && Math.abs(p.preco - produto.preco) < 1)
+                    );
+
+                    if (!jaExiste) {
+                        const precoFloat = parseFloat(produto.preco) || 0;
+                        const margemReais = valorGoverno - precoFloat;
+                        const margemPercentual = valorGoverno > 0
+                            ? ((margemReais / valorGoverno) * 100)
+                            : 0;
+
+                        produtosCapturados.push({
+                            ...produto,
+                            preco: precoFloat, // Garantir que é número
+                            selecionado: true,
+                            margem_reais: margemReais,
+                            margem_percentual: margemPercentual
+                        });
+
+                        console.log(`✓ Produto adicionado: ${produto.titulo} - R$ ${precoFloat} (margem: ${margemPercentual.toFixed(1)}%)`);
+                    }
+                });
+
+                console.log(`📦 Total de produtos capturados: ${produtosCapturados.length}`);
+
+                // Atualizar interface
+                atualizarListaProdutos();
+            }
+        });
+
+        // Atualizar lista visual de produtos
+        function atualizarListaProdutos() {
+            console.log('🔄 atualizarListaProdutos() chamada. Total produtos:', produtosCapturados.length);
+
+            const secao = document.getElementById('secao-produtos-capturados');
+            const lista = document.getElementById('lista-produtos-capturados');
+            const total = document.getElementById('total-capturados');
+            const instrucoes = document.getElementById('instrucoes-extensao');
+            const acoes = document.getElementById('acoes-capturados');
+
+            // Verificar se elementos existem
+            if (!secao || !lista || !total || !instrucoes || !acoes) {
+                console.error('❌ Elementos do modal não encontrados:');
+                console.error('  - secao:', !!secao);
+                console.error('  - lista:', !!lista);
+                console.error('  - total:', !!total);
+                console.error('  - instrucoes:', !!instrucoes);
+                console.error('  - acoes:', !!acoes);
+                alert('❌ Erro: Elementos do modal não encontrados. Certifique-se de que o modal está aberto.');
+                return;
+            }
+
+            if (produtosCapturados.length === 0) {
+                console.log('ℹ️ Nenhum produto para exibir. Ocultando seção.');
+                secao.style.display = 'none';
+                return;
+            }
+
+            console.log(`✓ Exibindo ${produtosCapturados.length} produtos`);
+
+            // Mostrar seção
+            secao.style.display = 'block';
+            instrucoes.style.display = 'none';
+            acoes.style.display = 'flex';
+            total.textContent = produtosCapturados.length;
+
+            // Renderizar produtos
+            lista.innerHTML = produtosCapturados.map((produto, index) => {
+                const margemClasse = produto.margem_reais > 0 ? 'margem-positiva' :
+                                    produto.margem_reais < 0 ? 'margem-negativa' : 'margem-neutra';
+                const margemTexto = produto.margem_reais > 0
+                    ? `+R$ ${produto.margem_reais.toFixed(2)} (${produto.margem_percentual.toFixed(1)}%)`
+                    : `R$ ${Math.abs(produto.margem_reais).toFixed(2)} (${Math.abs(produto.margem_percentual).toFixed(1)}%)`;
+
+                return `
+                    <div class="produto-capturado">
+                        <input type="checkbox"
+                               id="produto-${index}"
+                               ${produto.selecionado ? 'checked' : ''}
+                               onchange="toggleProduto(${index})">
+
+                        ${produto.imagem ? `<img src="${produto.imagem}" alt="Produto" onerror="this.style.display='none'">` : ''}
+
+                        <div class="produto-info">
+                            <div class="produto-titulo">${produto.titulo}</div>
+                            <div class="produto-preco">R$ ${produto.preco.toFixed(2).replace('.', ',')}</div>
+                            <div class="produto-fonte">
+                                <i class="fas fa-store"></i> ${produto.fonte}
+                                ${produto.frete_gratis ? ' • <span class="frete-gratis">Frete Grátis</span>' : ''}
+                            </div>
+                        </div>
+
+                        <div class="margem-badge ${margemClasse}">
+                            ${margemTexto}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Toggle seleção de produto individual
+        function toggleProduto(index) {
+            produtosCapturados[index].selecionado = !produtosCapturados[index].selecionado;
+        }
+
+        // Toggle todos os produtos
+        function toggleTodosProdutos() {
+            const checkbox = document.getElementById('selecionar-todos-produtos');
+            const novoEstado = checkbox.checked;
+
+            produtosCapturados.forEach(p => p.selecionado = novoEstado);
+
+            // Atualizar checkboxes individuais
+            produtosCapturados.forEach((_, index) => {
+                const cb = document.getElementById(`produto-${index}`);
+                if (cb) cb.checked = novoEstado;
+            });
+        }
+
+        // Salvar produtos selecionados
+        async function salvarProdutosSelecionados() {
+            const selecionados = produtosCapturados.filter(p => p.selecionado);
+
+            if (selecionados.length === 0) {
+                alert('❌ Selecione pelo menos um produto!');
+                return;
+            }
+
+            if (!licitacaoAtual) {
+                alert('❌ Erro: Informações da licitação não encontradas!');
+                return;
+            }
+
+            const btnSalvar = event.target;
+            const textoOriginal = btnSalvar.innerHTML;
+            btnSalvar.disabled = true;
+            btnSalvar.style.opacity = '0.6';
+
+            // Criar barra de progresso
+            const progressHtml = `
+                <div id="progress-container" style="margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 2px solid #e3f2fd;">
+                    <div style="margin-bottom: 10px; font-weight: bold; color: #2c3e50;">
+                        <i class="fas fa-sync fa-spin" style="color: #3498db; margin-right: 8px;"></i>
+                        Salvando produtos... <span id="progress-text" style="color: #3498db;">0%</span>
+                    </div>
+                    <div style="background: #e0e0e0; height: 30px; border-radius: 15px; overflow: hidden; position: relative; box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                        <div id="progress-bar" style="background: linear-gradient(90deg, #3498db, #2ecc71); height: 100%; width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                            <span id="progress-count">0 / ${selecionados.length}</span>
+                        </div>
+                    </div>
+                    <div id="progress-status" style="margin-top: 10px; font-size: 13px; color: #7f8c8d;">
+                        <i class="fas fa-clock" style="margin-right: 5px;"></i>
+                        Preparando envio...
+                    </div>
+                </div>
+            `;
+
+            // Inserir barra de progresso no container fixo
+            const progressWrapper = document.getElementById('progress-container-wrapper');
+            progressWrapper.innerHTML = progressHtml;
+            progressWrapper.style.minHeight = '120px';
+
+            try {
+                // Dividir em lotes de 5 produtos (para evitar mod_security - Hostinger muito restritivo)
+                const loteSize = 5;
+                const lotes = [];
+
+                for (let i = 0; i < selecionados.length; i += loteSize) {
+                    lotes.push(selecionados.slice(i, i + loteSize));
+                }
+
+                console.log(`📦 Total de ${selecionados.length} produtos divididos em ${lotes.length} lotes de ${loteSize}`);
+
+                let produtosSalvos = 0;
+                let ultimaAnalise = null;
+
+                // Enviar cada lote com delay
+                for (let i = 0; i < lotes.length; i++) {
+                    const lote = lotes[i];
+                    const loteNum = i + 1;
+
+                    // Atualizar status
+                    document.getElementById('progress-status').textContent =
+                        `Enviando lote ${loteNum} de ${lotes.length} (${lote.length} produtos)...`;
+
+                    console.log(`📤 Enviando lote ${loteNum}/${lotes.length} com ${lote.length} produtos`);
+
+                    const response = await fetch('/backend/public/api/comparacoes/salvar.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${localStorage.getItem('session_id')}`
+                        },
+                        body: JSON.stringify({
+                            licitacao_id: licitacaoAtual.id,
+                            licitacao_descricao: licitacaoAtual.descricao,
+                            preco_governo: licitacaoAtual.valor_governo,
+                            produtos: lote.map(p => ({
+                                titulo: p.titulo,
+                                preco: p.preco,
+                                url: p.url,
+                                fonte: p.fonte,
+                                imagem_url: p.imagem || null,
+                                frete_gratis: p.frete_gratis || false,
+                                margem_reais: p.margem_reais,
+                                margem_percentual: p.margem_percentual
+                            }))
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    console.log(`📊 Resposta do lote ${loteNum}:`, data);
+
+                    if (!data.success) {
+                        console.error(`❌ Erro no lote ${loteNum}:`, data.error);
+                        throw new Error(data.error || 'Erro ao salvar lote ' + loteNum);
+                    }
+
+                    produtosSalvos += lote.length;
+
+                    // Capturar análise (pode vir em data.analise ou data.data.analise)
+                    ultimaAnalise = data.analise || (data.data && data.data.analise) || null;
+
+                    if (ultimaAnalise) {
+                        console.log(`✓ Análise recebida do lote ${loteNum}:`, ultimaAnalise);
+                    } else {
+                        console.warn(`⚠️ Nenhuma análise retornada no lote ${loteNum}`);
+                    }
+
+                    // Atualizar barra de progresso
+                    const progresso = Math.round((produtosSalvos / selecionados.length) * 100);
+                    document.getElementById('progress-bar').style.width = progresso + '%';
+                    document.getElementById('progress-text').textContent = progresso + '%';
+                    document.getElementById('progress-count').textContent = `${produtosSalvos} / ${selecionados.length}`;
+
+                    console.log(`✅ Lote ${loteNum} salvo com sucesso! Total: ${produtosSalvos}/${selecionados.length}`);
+
+                    // Delay de 3 segundos entre lotes (exceto no último) - evitar bloqueio mod_security
+                    if (i < lotes.length - 1) {
+                        document.getElementById('progress-status').textContent =
+                            `Aguardando 3 segundos antes do próximo lote...`;
+
+                        await new Promise(resolve => setTimeout(resolve, 3000));
+                    }
+                }
+
+                // Mostrar mensagem de sucesso na barra de progresso
+                document.getElementById('progress-status').innerHTML = `
+                    <i class="fas fa-check-circle" style="color: #2ecc71; margin-right: 5px;"></i>
+                    <strong style="color: #2ecc71;">Concluído! ${produtosSalvos} produtos salvos com sucesso.</strong>
+                `;
+
+                // Aguardar 2 segundos antes de remover a barra
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Remover barra de progresso com animação
+                const progressWrapper = document.getElementById('progress-container-wrapper');
+                progressWrapper.style.minHeight = '0';
+                progressWrapper.innerHTML = '';
+
+                btnSalvar.disabled = false;
+                btnSalvar.style.opacity = '1';
+                btnSalvar.innerHTML = textoOriginal;
+
+                // Mostrar análise
+                console.log('📊 Verificando análise final:', ultimaAnalise);
+                if (ultimaAnalise) {
+                    console.log('✓ Chamando mostrarAnalise()');
+                    mostrarAnalise(ultimaAnalise);
+                } else {
+                    console.warn('⚠️ Nenhuma análise disponível para mostrar');
+                }
+
+            } catch (error) {
+                console.error('Erro:', error);
+
+                // Mostrar mensagem de erro na barra de progresso
+                const progressStatus = document.getElementById('progress-status');
+                if (progressStatus) {
+                    progressStatus.innerHTML = `
+                        <i class="fas fa-exclamation-circle" style="color: #e74c3c; margin-right: 5px;"></i>
+                        <strong style="color: #e74c3c;">Erro: ${error.message}</strong>
+                    `;
+
+                    // Aguardar 3 segundos antes de remover
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                }
+
+                // Remover barra de progresso
+                const progressWrapper = document.getElementById('progress-container-wrapper');
+                progressWrapper.style.minHeight = '0';
+                progressWrapper.innerHTML = '';
+
+                btnSalvar.disabled = false;
+                btnSalvar.style.opacity = '1';
+                btnSalvar.innerHTML = textoOriginal;
+
+                alert('❌ Erro ao salvar produtos: ' + error.message);
+            }
+        }
+
+        // Mostrar análise de oportunidades
+        function mostrarAnalise(analise) {
+            console.log('📊 mostrarAnalise() chamada com:', analise);
+
+            const secao = document.getElementById('secao-analise');
+            const resultado = document.getElementById('resultado-analise');
+
+            if (!secao || !resultado) {
+                console.error('❌ Elementos da análise não encontrados');
+                console.error('  - secao-analise:', !!secao);
+                console.error('  - resultado-analise:', !!resultado);
+                return;
+            }
+
+            console.log('✓ Exibindo seção de análise');
+            secao.style.display = 'block';
+
+            resultado.innerHTML = `
+                <div class="analise-grid">
+                    <div class="analise-item">
+                        <div class="analise-label">Menor Preço Mercado</div>
+                        <div class="analise-valor" style="color: #27ae60;">R$ ${analise.menor_preco.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                    <div class="analise-item">
+                        <div class="analise-label">Preço Médio</div>
+                        <div class="analise-valor" style="color: #666;">R$ ${analise.preco_medio.toFixed(2).replace('.', ',')}</div>
+                    </div>
+                    <div class="analise-item">
+                        <div class="analise-label">Melhor Oportunidade</div>
+                        <div class="analise-valor" style="color: #27ae60; font-weight: bold;">
+                            +R$ ${analise.melhor_margem.toFixed(2).replace('.', ',')}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recomendacao">
+                    <strong>💡 Recomendação:</strong> ${analise.recomendacao}
+                </div>
+            `;
+        }
+
+        // Limpar produtos capturados
+        function limparProdutosCapturados() {
+            if (confirm('⚠️ Deseja realmente limpar todos os produtos capturados?')) {
+                produtosCapturados = [];
+                atualizarListaProdutos();
+                document.getElementById('secao-analise').style.display = 'none';
+            }
+        }
+
+        // ========== SELEÇÃO INTERATIVA DE KEYWORDS ==========
+
+        // Atualizar links de busca com keywords selecionadas
+        function atualizarLinksBusca() {
+            let termoBusca;
+
+            // MODO 1: Descrição completa CATMAT (usuário clicou em sugestão CATMAT)
+            if (window.modoCatmatDescricao && window.descricaoCatmatAtual) {
+                termoBusca = window.descricaoCatmatAtual;
+            }
+            // MODO 2: Keywords selecionadas (modo padrão)
+            else {
+                const checkboxes = document.querySelectorAll('#keywords-selecionaveis input[type="checkbox"]:checked');
+                const palavrasSelecionadas = Array.from(checkboxes).map(cb => cb.value);
+
+                // Remover duplicatas
+                const palavrasUnicas = [...new Set(palavrasSelecionadas)];
+
+                // Se nenhuma palavra selecionada, usar descrição original ou termo genérico
+                if (palavrasUnicas.length === 0) {
+                    // Tentar usar a descrição original (primeiras 3 palavras relevantes)
+                    if (window.licitacaoAtual && window.licitacaoAtual.descricao) {
+                        const descricao = window.licitacaoAtual.descricao;
+                        const palavras = descricao.toLowerCase()
+                            .replace(/[^a-záàâãéèêíïóôõöúçñ\s]/g, ' ')
+                            .split(/\s+/)
+                            .filter(p => p.length >= 4 && !['para', 'com', 'de', 'da', 'do'].includes(p))
+                            .slice(0, 3);
+                        termoBusca = palavras.join(' ') || 'produto';
+                    } else {
+                        termoBusca = 'produto';
+                    }
+                } else {
+                    termoBusca = palavrasUnicas.join(' ');
+                }
+            }
+
+            const linksContainer = document.getElementById('modal-links');
+            if (linksContainer) {
+                linksContainer.innerHTML = gerarLinksLojas(termoBusca);
+            }
+        }
+
+        // Selecionar/desselecionar todas as keywords
+        function selecionarTodasKeywords(selecionar) {
+            const checkboxes = document.querySelectorAll('#keywords-selecionaveis input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = selecionar);
+            atualizarLinksBusca();
+        }
+
+        // Limpar descrição CATMAT para busca otimizada
+        function limparDescricaoCatmat(descricao) {
+            if (!descricao) return '';
+
+            let textoLimpo = descricao;
+
+            // Remover padrões irrelevantes
+            textoLimpo = textoLimpo.replace(/CARACTERÍSTICAS ADICIONAIS:/gi, '');
+            textoLimpo = textoLimpo.replace(/APLICAÇÃO:/gi, '');
+            textoLimpo = textoLimpo.replace(/COMPOSIÇÃO:/gi, '');
+            textoLimpo = textoLimpo.replace(/OBSERVAÇÕES:/gi, '');
+            textoLimpo = textoLimpo.replace(/NORMAS?:\s*[A-Z0-9\-\/\s]+/gi, '');
+
+            // Remover excesso de espaços e pontuação múltipla
+            textoLimpo = textoLimpo.replace(/\s+/g, ' ');
+            textoLimpo = textoLimpo.replace(/,+/g, ',');
+            textoLimpo = textoLimpo.replace(/\.+/g, '.');
+            textoLimpo = textoLimpo.trim();
+
+            // Limitar a 200 caracteres (priorizar início que tem info mais relevante)
+            if (textoLimpo.length > 200) {
+                textoLimpo = textoLimpo.substring(0, 200).trim();
+                // Remover palavra incompleta no final
+                const ultimoEspaco = textoLimpo.lastIndexOf(' ');
+                if (ultimoEspaco > 150) {
+                    textoLimpo = textoLimpo.substring(0, ultimoEspaco);
+                }
+            }
+
+            return textoLimpo;
+        }
+
+        // Usar sugestão CATMAT (usar descrição completa editável)
+        function usarSugestaoCatmat(index) {
+            if (!window.sugestoesCatmat || !window.sugestoesCatmat[index]) {
+                alert('❌ Sugestão não encontrada');
+                return;
+            }
+
+            const sugestao = window.sugestoesCatmat[index];
+            const keywordsContainer = document.getElementById('keywords-info');
+
+            // Limpar descrição CATMAT
+            const descricaoLimpa = limparDescricaoCatmat(sugestao.descricao);
+
+            // Armazenar descrição atual para uso nas buscas
+            window.descricaoCatmatAtual = descricaoLimpa;
+            window.modoCatmatDescricao = true;
+
+            // Renderizar modo de descrição completa editável
+            keywordsContainer.innerHTML = `
+                <div style="margin-bottom: 15px; padding: 12px; background: #e8f5e9; border-radius: 6px; border-left: 4px solid #4caf50;">
+                    <strong style="color: #2e7d32;">
+                        <i class="fas fa-check-circle"></i> Usando CATMAT ${sugestao.codigo_item}
+                    </strong>
+                    <div style="font-size: 0.85rem; color: #555; margin-top: 4px;">
+                        ${sugestao.categoria ? sugestao.categoria.grupo : ''} • Relevância: ⭐ ${sugestao.relevancia}
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+                        <i class="fas fa-edit"></i> Descrição para busca (editável):
+                    </label>
+                    <textarea id="descricao-catmat-editavel"
+                              oninput="atualizarContadorCaracteres(); atualizarDescricaoCatmat();"
+                              style="width: 100%; min-height: 80px; padding: 10px; border: 2px solid #4caf50; border-radius: 6px; font-size: 0.95rem; resize: vertical; font-family: inherit;"
+                    >${descricaoLimpa}</textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <small id="contador-caracteres" style="color: #666;">
+                            ${descricaoLimpa.length} / 200 caracteres
+                        </small>
+                        <button onclick="voltarParaKeywords()"
+                                style="background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                            <i class="fas fa-undo"></i> Usar keywords ao invés
+                        </button>
+                    </div>
+                </div>
+
+                <div style="padding: 10px; background: #f5f5f5; border-radius: 4px; font-size: 0.85rem; color: #666;">
+                    <i class="fas fa-info-circle"></i> <strong>Dica:</strong> A descrição completa do CATMAT geralmente funciona melhor em sites de e-commerce. Você pode editar o texto acima para refinar a busca.
+                </div>
+            `;
+
+            // Atualizar links com a descrição CATMAT
+            atualizarLinksBusca();
+        }
+
+        // Atualizar contador de caracteres
+        function atualizarContadorCaracteres() {
+            const textarea = document.getElementById('descricao-catmat-editavel');
+            const contador = document.getElementById('contador-caracteres');
+
+            if (textarea && contador) {
+                const tamanho = textarea.value.length;
+                contador.textContent = `${tamanho} / 200 caracteres`;
+
+                // Avisar se ultrapassar 200 caracteres
+                if (tamanho > 200) {
+                    contador.style.color = '#f44336';
+                    contador.textContent = `${tamanho} / 200 caracteres (excedido!)`;
+                } else {
+                    contador.style.color = '#666';
+                }
+            }
+        }
+
+        // Atualizar descrição CATMAT quando o usuário editar
+        function atualizarDescricaoCatmat() {
+            const textarea = document.getElementById('descricao-catmat-editavel');
+            if (textarea) {
+                window.descricaoCatmatAtual = textarea.value;
+                atualizarLinksBusca();
+            }
+        }
+
+        // Renderizar keywords com seleção interativa
+        function renderizarKeywords(palavras, sugestoes_catmat) {
+            const keywordsContainer = document.getElementById('keywords-info');
+            if (!keywordsContainer) return;
+
+            // Construir HTML com sugestões CATMAT (se houver)
+            let htmlSugestoesCatmat = '';
+            if (sugestoes_catmat && sugestoes_catmat.length > 0) {
+                htmlSugestoesCatmat = `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #fff8e1; border-radius: 8px; border-left: 4px solid #ffa726;">
+                        <strong style="color: #f57c00; display: block; margin-bottom: 10px;">
+                            <i class="fas fa-lightbulb"></i> ${sugestoes_catmat.length} sugestão(ões) encontrada(s) no CATMAT:
+                        </strong>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${sugestoes_catmat.map((sug, idx) => `
+                                <div style="background: white; padding: 10px 12px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;"
+                                     onmouseover="this.style.borderColor='#ffa726'"
+                                     onmouseout="this.style.borderColor='transparent'"
+                                     onclick="usarSugestaoCatmat(${idx})"
+                                     title="Clique para usar esta descrição">
+                                    <div style="font-size: 0.85rem; color: #666; margin-bottom: 4px;">
+                                        <strong>CATMAT ${sug.codigo_item}</strong> • ${sug.categoria.grupo} → ${sug.categoria.classe}
+                                        <span style="float: right; color: #4caf50;">⭐ ${sug.relevancia}</span>
+                                    </div>
+                                    <div style="font-size: 0.9rem; color: #333;">
+                                        ${sug.descricao.substring(0, 150)}${sug.descricao.length > 150 ? '...' : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Mostrar keywords com seleção interativa
+            keywordsContainer.innerHTML = htmlSugestoesCatmat + `
+                <div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <strong style="color: #333;">🎯 Selecione os termos para busca:</strong>
+                        <div>
+                            <button onclick="selecionarTodasKeywords(true)" style="background: #2196F3; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 5px; font-size: 0.85rem;">
+                                ✓ Todos
+                            </button>
+                            <button onclick="selecionarTodasKeywords(false)" style="background: #999; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">
+                                ✗ Nenhum
+                            </button>
+                        </div>
+                    </div>
+                    <div id="keywords-selecionaveis" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
+                        ${palavras.map((p, idx) => `
+                            <label style="cursor: pointer; user-select: none;">
+                                <input type="checkbox"
+                                       id="keyword-${idx}"
+                                       value="${p.palavra}"
+                                       checked
+                                       onchange="atualizarLinksBusca()"
+                                       style="margin-right: 4px;">
+                                <span style="background: #e3f2fd; padding: 6px 12px; border-radius: 16px; font-size: 0.9rem; color: #1565c0; display: inline-block;">
+                                    ${p.palavra}
+                                    <span style="opacity: 0.7; font-size: 0.8rem;">(${p.tipo})</span>
+                                </span>
+                            </label>
+                        `).join('')}
+                    </div>
+                    <div style="border-top: 1px solid #e0e0e0; padding-top: 12px;">
+                        <button onclick="feedbackKeywords('positivo')" style="background: #4caf50; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-right: 5px;" title="Palavras-chave úteis">
+                            👍 Útil
+                        </button>
+                        <button onclick="feedbackKeywords('negativo')" style="background: #f44336; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer;" title="Palavras-chave não úteis">
+                            👎 Não útil
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Voltar para modo de keywords
+        async function voltarParaKeywords() {
+            window.modoCatmatDescricao = false;
+            window.descricaoCatmatAtual = null;
+
+            const keywordsContainer = document.getElementById('keywords-info');
+            if (!keywordsContainer) return;
+
+            // Mostrar loading
+            keywordsContainer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando keywords...';
+
+            try {
+                // Reextrair keywords da descrição original
+                const response = await api.request('/keywords/extrair.php', {
+                    method: 'POST',
+                    body: JSON.stringify({ descricao: window.currentObjeto })
+                });
+
+                if (response.success && response.data) {
+                    const apiData = response.data.data || response.data;
+                    const { palavras, sugestoes_catmat } = apiData;
+
+                    if (!palavras || !Array.isArray(palavras)) {
+                        throw new Error('Resposta da API inválida');
+                    }
+
+                    // Armazenar dados globalmente
+                    window.keywordsExtraidas = palavras;
+                    window.sugestoesCatmat = sugestoes_catmat || [];
+
+                    // Renderizar keywords
+                    renderizarKeywords(palavras, sugestoes_catmat);
+
+                    // Atualizar links
+                    atualizarLinksBusca();
+                } else {
+                    throw new Error('Erro ao extrair keywords');
+                }
+            } catch (error) {
+                console.error('Erro ao voltar para keywords:', error);
+                keywordsContainer.innerHTML = `
+                    <div style="padding: 15px; background: #fff3cd; border-radius: 6px;">
+                        <i class="fas fa-exclamation-triangle"></i> Erro ao carregar keywords. Tente novamente.
+                    </div>
+                `;
+            }
+        }
+
+        // ========== FEEDBACK DE KEYWORDS ==========
+        async function feedbackKeywords(tipo) {
+            if (!window.keywordsExtraidas || window.keywordsExtraidas.length === 0) {
+                alert('❌ Nenhuma palavra-chave para avaliar');
+                return;
+            }
+
+            try {
+                // Enviar feedback para todas as palavras extraídas
+                const promises = window.keywordsExtraidas.map(p =>
+                    api.request('/keywords/feedback.php', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            palavra: p.palavra,
+                            tipo: tipo
+                        })
+                    })
+                );
+
+                await Promise.all(promises);
+
+                // Feedback visual
+                const keywordsContainer = document.getElementById('keywords-info');
+                const mensagem = tipo === 'positivo'
+                    ? '✅ Obrigado! As palavras-chave foram marcadas como úteis.'
+                    : '📝 Obrigado pelo feedback! Vamos melhorar a extração.';
+
+                // Adicionar mensagem temporária
+                const feedback = document.createElement('div');
+                feedback.style.cssText = 'background: #4caf50; color: white; padding: 8px 12px; border-radius: 6px; margin-top: 10px; text-align: center;';
+                feedback.textContent = mensagem;
+                keywordsContainer.appendChild(feedback);
+
+                // Remover após 3 segundos
+                setTimeout(() => feedback.remove(), 3000);
+
+                // Desabilitar botões para evitar múltiplos feedbacks
+                const botoes = keywordsContainer.querySelectorAll('button');
+                botoes.forEach(btn => btn.disabled = true);
+
+            } catch (error) {
+                console.error('Erro ao enviar feedback:', error);
+                alert('❌ Erro ao registrar feedback. Tente novamente.');
+            }
+        }
+    </script>
+
+    <!-- Modal Comparador de Preços -->
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-comparar-precos" class="modal">
+        <div class="modal-header">
+            <h2 class="modal-title"><i class="fas fa-search-dollar"></i> Comparar Preços</h2>
+            <button class="modal-close" onclick="fecharModalComparar()" aria-label="Fechar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-produto">
+            <div class="modal-produto-titulo" id="modal-descricao">Carregando...</div>
+            <div class="modal-produto-preco" id="modal-preco">R$ 0,00</div>
+            <small style="color: #666; display: block; margin-top: 8px;">
+                <i class="fas fa-info-circle"></i> Preço de referência do governo
+            </small>
+        </div>
+
+        <!-- Seção de Keywords Inteligentes -->
+        <div id="keywords-info" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #667eea;">
+            <i class="fas fa-spinner fa-spin"></i> Carregando...
+        </div>
+
+        <h3 class="modal-lojas-titulo"><i class="fas fa-store"></i> Buscar em lojas online:</h3>
+        <div class="modal-lojas-grid" id="modal-links">
+            <!-- Links serão inseridos aqui via JavaScript -->
+        </div>
+
+        <div style="margin-top: 25px; padding: 15px; background: #e3f2fd; border-radius: 8px; border-left: 4px solid #2196F3;">
+            <p style="margin: 0; font-size: 0.9rem; color: #1565c0;">
+                <i class="fas fa-info-circle"></i>
+                <strong>Como usar:</strong> Clique nos botões acima para abrir os sites. Depois, use a extensão do navegador para capturar os produtos automaticamente.
+            </p>
+        </div>
+
+        <!-- NOVA SEÇÃO: Produtos Capturados -->
+        <div id="secao-produtos-capturados" style="display: none; margin-top: 30px; padding-top: 25px; border-top: 2px solid #e5e5e5;">
+            <h3 style="font-size: 1.1rem; color: #333; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+                <span><i class="fas fa-box-open"></i> Produtos Capturados (<span id="total-capturados">0</span>)</span>
+                <div style="font-size: 0.85rem; font-weight: normal; color: #666;">
+                    <label style="cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="selecionar-todos-produtos" checked onchange="toggleTodosProdutos()">
+                        Selecionar todos
+                    </label>
+                </div>
+            </h3>
+
+            <div id="instrucoes-extensao" style="background: #fff3cd; padding: 12px 15px; border-radius: 6px; color: #856404; font-size: 0.9rem; margin-bottom: 15px;">
+                <i class="fas fa-lightbulb"></i>
+                Nenhum produto capturado ainda. Use a extensão do navegador ao visitar os sites acima.
+            </div>
+
+            <div id="lista-produtos-capturados" style="max-height: 400px; overflow-y: auto; margin-bottom: 15px;">
+                <!-- Produtos aparecerão aqui dinamicamente -->
+            </div>
+
+            <div id="acoes-capturados" style="display: none; gap: 10px; margin-top: 15px;">
+                <button class="btn-comparar-precos" onclick="salvarProdutosSelecionados()" style="flex: 1; margin: 0;">
+                    <i class="fas fa-save"></i> Salvar Comparação
+                </button>
+                <button onclick="limparProdutosCapturados()" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">
+                    <i class="fas fa-trash"></i> Limpar Lista
+                </button>
+            </div>
+
+            <!-- Container fixo para barra de progresso -->
+            <div id="progress-container-wrapper" style="min-height: 0; transition: min-height 0.3s;">
+                <!-- A barra de progresso será inserida aqui -->
+            </div>
+        </div>
+
+        <!-- NOVA SEÇÃO: Análise de Comparação -->
+        <div id="secao-analise" style="display: none; margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
+            <h3 style="font-size: 1.1rem; color: #333; margin-bottom: 15px;">
+                <i class="fas fa-chart-line"></i> Análise de Oportunidades
+            </h3>
+            <div id="resultado-analise">
+                <!-- Análise aparecerá aqui -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

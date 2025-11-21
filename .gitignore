@@ -1,0 +1,77 @@
+# Dependências e pacotes
+public_html/backend/vendor/
+node_modules/
+composer.phar
+
+# Arquivos de configuração sensíveis
+public_html/backend/config/database.php
+public_html/backend/config/jwt_secret.php
+*.env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+public_html/backend/logs/*.log
+public_html/backend/logs/*.txt
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Cache
+public_html/backend/cache/
+*.cache
+
+# Uploads e arquivos de usuário
+public_html/backend/uploads/
+public_html/frontend/uploads/
+
+# IDEs e editores
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Sistema operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Certificados e chaves privadas
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Arquivos de sessão do PHP
+public_html/backend/sessions/
+
+# Arquivos SQL com dados sensíveis (manter apenas estruturas)
+*_backup.sql
+*_dump.sql
+
+# Ignorar arquivos de email com credenciais
+ALERTA*.eml
+*credenciais*.txt
+
+# Arquivos problemáticos do Windows
+nul
+DO_NOT_UPLOAD_HERE

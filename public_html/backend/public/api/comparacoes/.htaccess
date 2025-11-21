@@ -1,0 +1,16 @@
+# Desabilitar mod_security para esta API
+<IfModule mod_security.c>
+    SecFilterEngine Off
+    SecFilterScanPOST Off
+</IfModule>
+
+# Desabilitar regras mod_security2
+<IfModule mod_security2.c>
+    SecRuleEngine Off
+</IfModule>
+
+# Permitir POST grande
+php_value post_max_size 50M
+php_value upload_max_filesize 50M
+php_value max_execution_time 300
+php_value max_input_time 300

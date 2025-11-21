@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste API Governo (Mock - Rápido)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1351b4;
+        }
+        .info {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        button {
+            background: #1351b4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #071d41;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Teste de Integração com API do Governo (MOCK)</h1>
+
+        <div class="info">
+            <strong>ℹ️ Modo de Teste:</strong> Esta versão usa dados simulados (mock) para resposta rápida.
+            Perfeito para testar a interface sem esperar pela API real do governo.
+        </div>
+
+        <p>Clique nos botões abaixo para testar:</p>
+
+        <div>
+            <button onclick="testarEndpoint('notebook')">Testar: Notebook</button>
+            <button onclick="testarEndpoint('impressora')">Testar: Impressora</button>
+            <button onclick="testarEndpoint('papel a4')">Testar: Papel A4</button>
+            <button onclick="testarEndpoint('cadeira')">Testar: Cadeira</button>
+        </div>
+
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        async function testarEndpoint(termo) {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = `<span class="loading">⏳ Buscando "${termo}"...</span>`;
+
+            try {
+                // Usar API MOCK para teste rápido
+                const url = `backend/public/api/inteligencia/buscar-precos-governo-mock.php?q=${encodeURIComponent(termo)}`;
+
+                console.log('Chamando:', url);
+
+                const response = await fetch(url);
+                const text = await response.text();
+
+                console.log('Resposta:', text);
+
+                // Tentar fazer parse como JSON
+                try {
+                    const data = JSON.parse(text);
+
+                    if (data.success) {
+                        resultado.innerHTML = `<span class="success">✅ SUCESSO!</span>\n\n` +
+                            JSON.stringify(data, null, 2);
+                    } else {
+                        resultado.innerHTML = `<span class="error">❌ ERRO</span>\n\n` +
+                            JSON.stringify(data, null, 2);
+                    }
+                } catch (e) {
+                    // Se não for JSON, mostrar o texto bruto
+                    resultado.innerHTML = `<span class="error">⚠️ Resposta não é JSON</span>\n\n` + text;
+                }
+
+            } catch (error) {
+                resultado.innerHTML = `<span class="error">❌ ERRO DE REDE</span>\n\n${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

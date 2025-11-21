@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Licita.pub</title>
+    <meta name="description" content="Consulte licitações e preços praticados pelo governo brasileiro">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-gavel"></i>
+                    <span>Licita.pub</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu" title="Fechar menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Principal</div>
+                    <ul class="nav-list">
+                        <li><a href="/frontend/app.html" class="nav-item active"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                        <li><a href="/frontend/consultas.html" class="nav-item"><i class="fas fa-file-contract"></i><span>Licitações</span></a></li>
+                        <li><a href="/frontend/inteligencia-precos.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Inteligência de Preços</span></a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Minha Conta</div>
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menu" title="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title"><i class="fas fa-home"></i> Dashboard</h1>
+                <div class="user-info"><i class="fas fa-user-circle"></i><span id="userName">Usuário</span></div>
+            </header>
+
+            <div class="content-body" id="mainContent">
+                <!-- Conteúdo será carregado dinamicamente aqui -->
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Carregando...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js?v=20241118c"></script>
+    <script src="js/api.js?v=20241118c"></script>
+    <script src="js/auth.js?v=20241118c"></script>
+    <script src="js/router.js?v=20241118c"></script>
+    <script src="js/app.js?v=20241118c"></script>
+
+    <!-- Módulos de páginas -->
+    <script src="js/modules/licitacoes.js?v=20241118c"></script>
+    <!-- NOTA: precos.js foi removido - agora use /frontend/inteligencia-precos.html -->
+</body>
+</html>

@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Licitações - Licita.pub</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-container {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e5e5;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            color: #1351b4;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .detalhe-item {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detalhe-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detalhe-label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .detalhe-valor {
+            font-size: 0.95rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .modal-container {
+                max-width: 100%;
+                max-height: 100vh;
+                border-radius: 0;
+            }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-gavel"></i>
+                    <span>Licita.pub</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Principal</div>
+                    <ul class="nav-list">
+                        <li><a href="/frontend/app.html" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                        <li><a href="/frontend/consultas.html" class="nav-item active"><i class="fas fa-file-contract"></i><span>Licitações</span></a></li>
+                        <li><a href="/frontend/inteligencia-precos.html" class="nav-item"><i class="fas fa-chart-line"></i><span>Inteligência de Preços</span></a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Minha Conta</div>
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Conteúdo Principal -->
+        <main class="main-content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title"><i class="fas fa-file-contract"></i> Licitações</h1>
+                <div class="user-info"><i class="fas fa-user-circle"></i><span id="userName">Usuário</span></div>
+            </header>
+
+            <div class="content-body">
+                <!-- Filtros -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-filter"></i> Filtros de Busca</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="formFiltros" onsubmit="buscarLicitacoes(event)">
+                            <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-bottom: 15px;">
+                                <div class="form-group">
+                                    <label class="form-label">Palavra-chave</label>
+                                    <input type="text" class="form-input" id="filtroQ" placeholder="Digite para buscar...">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Estado (UF)</label>
+                                    <select class="form-select" id="filtroUF">
+                                        <option value="">Todos</option>
+                                        <option value="AC">Acre</option>
+                                        <option value="AL">Alagoas</option>
+                                        <option value="AP">Amapá</option>
+                                        <option value="AM">Amazonas</option>
+                                        <option value="BA">Bahia</option>
+                                        <option value="CE">Ceará</option>
+                                        <option value="DF">Distrito Federal</option>
+                                        <option value="ES">Espírito Santo</option>
+                                        <option value="GO">Goiás</option>
+                                        <option value="MA">Maranhão</option>
+                                        <option value="MT">Mato Grosso</option>
+                                        <option value="MS">Mato Grosso do Sul</option>
+                                        <option value="MG">Minas Gerais</option>
+                                        <option value="PA">Pará</option>
+                                        <option value="PB">Paraíba</option>
+                                        <option value="PR">Paraná</option>
+                                        <option value="PE">Pernambuco</option>
+                                        <option value="PI">Piauí</option>
+                                        <option value="RJ">Rio de Janeiro</option>
+                                        <option value="RN">Rio Grande do Norte</option>
+                                        <option value="RS">Rio Grande do Sul</option>
+                                        <option value="RO">Rondônia</option>
+                                        <option value="RR">Roraima</option>
+                                        <option value="SC">Santa Catarina</option>
+                                        <option value="SP">São Paulo</option>
+                                        <option value="SE">Sergipe</option>
+                                        <option value="TO">Tocantins</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Município</label>
+                                    <input type="text" class="form-input" id="filtroMunicipio" placeholder="Nome do município">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Modalidade</label>
+                                    <select class="form-select" id="filtroModalidade">
+                                        <option value="">Todas</option>
+                                        <option value="PREGAO_ELETRONICO">Pregão Eletrônico</option>
+                                        <option value="PREGAO_PRESENCIAL">Pregão Presencial</option>
+                                        <option value="CONCORRENCIA">Concorrência</option>
+                                        <option value="TOMADA_PRECOS">Tomada de Preços</option>
+                                        <option value="CONVITE">Convite</option>
+                                        <option value="DISPENSA">Dispensa</option>
+                                        <option value="INEXIGIBILIDADE">Inexigibilidade</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Situação</label>
+                                    <select class="form-select" id="filtroSituacao">
+                                        <option value="">Todas</option>
+                                        <option value="EM_ANDAMENTO">Em Andamento</option>
+                                        <option value="SUSPENSA">Suspensa</option>
+                                        <option value="CANCELADA">Cancelada</option>
+                                        <option value="CONCLUIDA">Concluída</option>
+                                        <option value="HOMOLOGADA">Homologada</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data de Publicação (Início)</label>
+                                    <input type="date" class="form-input" id="filtroDataInicio">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data de Publicação (Fim)</label>
+                                    <input type="date" class="form-input" id="filtroDataFim">
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="limparFiltros()">
+                                    <i class="fas fa-eraser"></i> Limpar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Resultados -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Licitações Encontradas</h2>
+                        <span id="totalResultados">-- licitações</span>
+                    </div>
+                    <div class="card-body">
+                        <div id="listaLicitacoes">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                                <p>Carregando licitações...</p>
+                            </div>
+                        </div>
+                        <div id="paginacao" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div id="modalDetalhes" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="fecharModal()"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modalTitulo">Detalhes da Licitação</h2>
+                <button class="modal-close" onclick="fecharModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalConteudo">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Carregando detalhes...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModal()">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+                <button class="btn btn-primary" id="btnVerPNCP" onclick="abrirPNCP()" style="display: none;">
+                    <i class="fas fa-external-link-alt"></i> Ver no PNCP
+                </button>
+                <button class="btn btn-success" id="btnCompararPrecos" onclick="abrirComparadorPrecos()" style="display: none;">
+                    <i class="fas fa-search-dollar"></i> Comparar Preços
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Comparação de Preços -->
+    <div id="modalComparacao" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="fecharModalComparacao()"></div>
+        <div class="modal-container" style="max-width: 1200px; max-height: 95vh;">
+            <div class="modal-header">
+                <h2 id="modalComparacaoTitulo">
+                    <i class="fas fa-search-dollar"></i> Comparação de Preços - Inteligência
+                </h2>
+                <button class="modal-close" onclick="fecharModalComparacao()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalComparacaoConteudo" style="padding: 0;">
+                <!-- O conteúdo será carregado dinamicamente via API CATMAT -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="fecharModalComparacao()">
+                    <i class="fas fa-times"></i> Fechar
+                </button>
+                <button class="btn btn-primary" onclick="voltarDetalhes()" id="btnVoltarDetalhes" style="display: none;">
+                    <i class="fas fa-arrow-left"></i> Voltar aos Detalhes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js?v=20241118f"></script>
+    <script src="js/api.js?v=20241118f"></script>
+    <script>
+        let paginaAtual = 1;
+        let filtrosAtuais = {};
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', async function() {
+            await checkAuth();
+            await carregarUsuario();
+            await carregarLicitacoes();
+            initSidebar();
+            initLogout();
+        });
+
+        async function checkAuth() {
+            try {
+                const sessionId = localStorage.getItem('session_id');
+                if (!sessionId) {
+                    window.location.href = '/frontend/login.html';
+                    return;
+                }
+                const response = await api.me();
+                if (!response.success || !response.data || !response.data.usuario) {
+                    window.location.href = '/frontend/login.html';
+                }
+            } catch (error) {
+                console.error('Erro ao verificar autenticação:', error);
+                window.location.href = '/frontend/login.html';
+            }
+        }
+
+        async function carregarUsuario() {
+            const response = await api.me();
+            if (response.success && response.data && response.data.usuario) {
+                document.getElementById('userName').textContent = response.data.usuario.nome;
+            }
+        }
+
+        async function carregarLicitacoes() {
+            const listaEl = document.getElementById('listaLicitacoes');
+            listaEl.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Carregando licitações...</p></div>';
+
+            try {
+                const params = new URLSearchParams({
+                    pagina: paginaAtual,
+                    limite: 20,
+                    ...filtrosAtuais
+                });
+
+                const response = await api.request(`/licitacoes/buscar.php?${params}`);
+                console.log('Resposta da API:', response);
+
+                if (response.success && response.data && response.data.success) {
+                    const licitacoes = Array.isArray(response.data.data) ? response.data.data : [];
+                    const paginacao = response.data.paginacao || {};
+
+                    renderizarLicitacoes(licitacoes);
+                    renderizarPaginacao(paginacao);
+
+                    document.getElementById('totalResultados').textContent =
+                        `${paginacao.total || 0} licitações`;
+                } else {
+                    listaEl.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>Nenhuma licitação encontrada</h3></div>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar licitações:', error);
+                listaEl.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i><span>Erro ao carregar licitações</span></div>';
+            }
+        }
+
+        function renderizarLicitacoes(licitacoes) {
+            const listaEl = document.getElementById('listaLicitacoes');
+
+            if (!licitacoes || licitacoes.length === 0) {
+                listaEl.innerHTML = '<div class="empty-state"><i class="fas fa-inbox"></i><h3>Nenhuma licitação encontrada</h3></div>';
+                return;
+            }
+
+            listaEl.innerHTML = `
+                <div class="item-list">
+                    ${licitacoes.map(lic => `
+                        <div class="item">
+                            <div class="item-header">
+                                <span class="item-title">${lic.numero || lic.pncp_id}</span>
+                                <span class="status-badge">${lic.situacao || 'N/D'}</span>
+                            </div>
+                            <div class="item-description">
+                                ${lic.objeto || 'Sem descrição'}
+                            </div>
+                            <div class="item-meta">
+                                <span class="item-meta-item">
+                                    <i class="fas fa-building"></i>
+                                    ${lic.nome_orgao || '--'}
+                                </span>
+                                <span class="item-meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    ${lic.municipio || 'N/D'}, ${lic.uf || 'N/D'}
+                                </span>
+                                <span class="item-meta-item">
+                                    <i class="fas fa-calendar"></i>
+                                    ${utils.formatarData(lic.data_publicacao)}
+                                </span>
+                                ${lic.valor_estimado ? `
+                                    <span class="item-meta-item">
+                                        <i class="fas fa-dollar-sign"></i>
+                                        ${utils.formatarValor(lic.valor_estimado)}
+                                    </span>
+                                ` : ''}
+                                <span class="item-meta-item">
+                                    <i class="fas fa-gavel"></i>
+                                    ${lic.modalidade || '--'}
+                                </span>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-primary btn-sm" onclick="verDetalhes('${lic.pncp_id || lic.id}')">
+                                    <i class="fas fa-eye"></i> Ver Detalhes
+                                </button>
+                                <button class="btn btn-secondary btn-sm" onclick="compararPrecos('${(lic.objeto || '').replace(/'/g, "\\'")}', ${lic.valor_estimado || 0})">
+                                    <i class="fas fa-search-dollar"></i> Comparar Preços
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderizarPaginacao(paginacao) {
+            const paginacaoEl = document.getElementById('paginacao');
+
+            if (!paginacao || paginacao.total_paginas <= 1) {
+                paginacaoEl.innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="pagination">';
+
+            // Botão anterior
+            html += `<button class="pagination-btn" onclick="irParaPagina(${paginacao.pagina - 1})" ${paginacao.pagina === 1 ? 'disabled' : ''}><i class="fas fa-chevron-left"></i></button>`;
+
+            // Páginas
+            for (let i = 1; i <= Math.min(paginacao.total_paginas, 10); i++) {
+                html += `<button class="pagination-btn ${i === paginacao.pagina ? 'active' : ''}" onclick="irParaPagina(${i})">${i}</button>`;
+            }
+
+            // Botão próximo
+            html += `<button class="pagination-btn" onclick="irParaPagina(${paginacao.pagina + 1})" ${paginacao.pagina === paginacao.total_paginas ? 'disabled' : ''}><i class="fas fa-chevron-right"></i></button>`;
+
+            html += '</div>';
+            paginacaoEl.innerHTML = html;
+        }
+
+        let licitacaoAtual = null;
+
+        async function verDetalhes(id) {
+            if (!id) {
+                alert('ID da licitação não encontrado');
+                return;
+            }
+
+            // Abrir modal
+            const modal = document.getElementById('modalDetalhes');
+            const modalConteudo = document.getElementById('modalConteudo');
+            const modalTitulo = document.getElementById('modalTitulo');
+            const btnVerPNCP = document.getElementById('btnVerPNCP');
+            const btnCompararPrecos = document.getElementById('btnCompararPrecos');
+
+            modal.style.display = 'flex';
+            modalConteudo.innerHTML = '<div class="loading-container"><div class="spinner"></div><p>Carregando detalhes...</p></div>';
+            btnVerPNCP.style.display = 'none';
+            btnCompararPrecos.style.display = 'none';
+
+            try {
+                const response = await api.request(`/licitacoes/detalhes.php?id=${encodeURIComponent(id)}`);
+                console.log('Detalhes da licitação:', response);
+
+                if (response.success && response.data && response.data.success && response.data.data) {
+                    const lic = response.data.data;
+                    licitacaoAtual = lic;
+
+                    modalTitulo.textContent = lic.numero || lic.pncp_id || 'Detalhes da Licitação';
+
+                    modalConteudo.innerHTML = `
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Número da Licitação</span>
+                            <div class="detalhe-valor">${lic.numero || lic.pncp_id || 'Não informado'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Objeto</span>
+                            <div class="detalhe-valor">${lic.objeto || 'Não informado'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Órgão</span>
+                            <div class="detalhe-valor">${lic.nome_orgao || 'Não informado'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">CNPJ do Órgão</span>
+                            <div class="detalhe-valor">${lic.cnpj_orgao || 'Não informado'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Localização</span>
+                            <div class="detalhe-valor">${lic.municipio || 'N/D'}, ${lic.uf || 'N/D'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Modalidade</span>
+                            <div class="detalhe-valor">${lic.modalidade || 'Não informado'}</div>
+                        </div>
+
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Situação</span>
+                            <div class="detalhe-valor"><span class="status-badge">${lic.situacao || 'Não informado'}</span></div>
+                        </div>
+
+                        ${lic.data_publicacao ? `
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Data de Publicação</span>
+                            <div class="detalhe-valor">${utils.formatarData(lic.data_publicacao)}</div>
+                        </div>
+                        ` : ''}
+
+                        ${lic.data_abertura ? `
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Data de Abertura</span>
+                            <div class="detalhe-valor">${utils.formatarData(lic.data_abertura)}</div>
+                        </div>
+                        ` : ''}
+
+                        ${lic.valor_estimado ? `
+                        <div class="detalhe-item">
+                            <span class="detalhe-label">Valor Estimado</span>
+                            <div class="detalhe-valor">${utils.formatarValor(lic.valor_estimado)}</div>
+                        </div>
+                        ` : ''}
+                    `;
+
+                    // Mostrar botões
+                    if (lic.url_pncp) {
+                        btnVerPNCP.style.display = 'inline-flex';
+                    }
+                    btnCompararPrecos.style.display = 'inline-flex';
+
+                } else {
+                    modalConteudo.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i><span>Erro ao carregar detalhes da licitação</span></div>';
+                }
+            } catch (error) {
+                console.error('Erro ao carregar detalhes:', error);
+                modalConteudo.innerHTML = '<div class="alert alert-error"><i class="fas fa-exclamation-circle"></i><span>Erro ao conectar com o servidor</span></div>';
+            }
+        }
+
+        function fecharModal() {
+            const modal = document.getElementById('modalDetalhes');
+            modal.style.display = 'none';
+            licitacaoAtual = null;
+        }
+
+        function abrirPNCP() {
+            if (licitacaoAtual && licitacaoAtual.url_pncp) {
+                window.open(licitacaoAtual.url_pncp, '_blank');
+            }
+        }
+
+        async function abrirComparadorPrecos() {
+            console.log('Abrindo comparador de preços');
+            console.log('Licitação atual:', licitacaoAtual);
+
+            if (!licitacaoAtual) {
+                alert('Nenhuma licitação selecionada');
+                return;
+            }
+
+            if (!licitacaoAtual.objeto) {
+                alert('Objeto da licitação não disponível');
+                return;
+            }
+
+            const descricao = licitacaoAtual.objeto;
+            const valorEstimado = licitacaoAtual.valor_estimado || 0;
+
+            // Fechar modal de detalhes
+            fecharModal();
+
+            // Chamar a função compararPrecos que usa a API do CATMAT
+            await compararPrecos(descricao, valorEstimado);
+        }
+
+
+        function fecharModalComparacao() {
+            const modal = document.getElementById('modalComparacao');
+            modal.style.display = 'none';
+        }
+
+        function voltarDetalhes() {
+            fecharModalComparacao();
+            if (licitacaoAtual) {
+                verDetalhes(licitacaoAtual.pncp_id || licitacaoAtual.id);
+            }
+        }
+
+        // Fechar modal ao pressionar ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modalComparacao = document.getElementById('modalComparacao');
+                const modalDetalhes = document.getElementById('modalDetalhes');
+
+                if (modalComparacao.style.display === 'flex') {
+                    fecharModalComparacao();
+                } else if (modalDetalhes.style.display === 'flex') {
+                    fecharModal();
+                }
+            }
+        });
+
+        async function compararPrecos(descricao, valorEstimado = 0) {
+            if (!descricao) {
+                alert('Descrição não disponível');
+                return;
+            }
+
+            // Abrir modal de comparação
+            const modalComparacao = document.getElementById('modalComparacao');
+            const modalConteudo = document.getElementById('modalComparacaoConteudo');
+            const btnVoltarDetalhes = document.getElementById('btnVoltarDetalhes');
+
+            // Mostrar botão voltar se vier do modal de detalhes
+            if (licitacaoAtual) {
+                btnVoltarDetalhes.style.display = 'inline-flex';
+            }
+
+            modalComparacao.style.display = 'flex';
+            modalConteudo.innerHTML = '<div class="loading-container" style="padding: 40px;"><div class="spinner"></div><p>Buscando CATMAT e comparando preços...</p></div>';
+
+            try {
+                // Chamar API de preços do governo (que busca CATMAT automaticamente)
+                const response = await api.request(`/inteligencia/buscar-precos-governo.php?q=${encodeURIComponent(descricao)}&limite=10`);
+                console.log('Resposta buscar-precos-governo:', response);
+
+                if (response.success && response.data && response.data.success) {
+                    const dados = response.data;
+                    renderizarComparacaoPrecos(dados, descricao, valorEstimado);
+                } else {
+                    // Se não encontrou CATMAT, mostrar erro com sugestões
+                    const erro = response.data?.error || 'Erro ao buscar preços';
+                    const sugestoes = response.data?.sugestoes || [];
+
+                    let html = `
+                        <div style="padding: 24px;">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>${erro}</span>
+                            </div>
+                    `;
+
+                    if (sugestoes.length > 0) {
+                        html += `
+                            <h3 style="margin: 20px 0 10px 0;">Sugestões de produtos CATMAT:</h3>
+                            <div style="display: grid; gap: 10px;">
+                        `;
+                        sugestoes.forEach(s => {
+                            html += `
+                                <div style="border: 1px solid #e5e5e5; padding: 12px; border-radius: 4px; cursor: pointer;"
+                                     onclick="compararPrecos('${s.descricao.replace(/'/g, "\\'")}', ${valorEstimado})">
+                                    <strong>${s.codigo_catmat}</strong> - ${s.descricao}
+                                    <br><small style="color: #666;">${s.categoria}</small>
+                                </div>
+                            `;
+                        });
+                        html += '</div>';
+                    }
+
+                    html += '</div>';
+                    modalConteudo.innerHTML = html;
+                }
+
+            } catch (error) {
+                console.error('Erro ao comparar preços:', error);
+                modalConteudo.innerHTML = `
+                    <div style="padding: 24px;">
+                        <div class="alert alert-error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span>Erro ao buscar preços: ${error.message}</span>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderizarComparacaoPrecos(dados, descricao, valorLicitacao) {
+            const modalConteudo = document.getElementById('modalComparacaoConteudo');
+
+            const catmat = dados.catmat;
+            const precosGov = dados.precos_governo;
+            const oportunidades = dados.oportunidades;
+            const analise = dados.analise;
+
+            let html = `
+                <div style="padding: 24px;">
+                    <!-- CATMAT Encontrado -->
+                    <div style="margin-bottom: 20px; padding: 15px; background: #e8f4f8; border-left: 4px solid #1351b4; border-radius: 4px;">
+                        <h3 style="margin: 0 0 10px 0; color: #1351b4;">
+                            <i class="fas fa-tag"></i> CATMAT: ${catmat.codigo}
+                        </h3>
+                        <p style="margin: 0;"><strong>${catmat.descricao}</strong></p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.85rem; color: #666;">Categoria: ${catmat.categoria}</p>
+                    </div>
+
+                    <!-- Análise Geral -->
+                    ${analise ? `
+                    <div style="margin-bottom: 20px; padding: 15px; background: #f0fff4; border-left: 4px solid #28a745; border-radius: 4px;">
+                        <h3 style="margin: 0 0 10px 0;"><i class="fas fa-chart-line"></i> Análise Geral</h3>
+                        <p style="margin: 0;"><strong>${analise.resumo}</strong></p>
+                        <p style="margin: 10px 0 0 0;">${analise.recomendacao_geral}</p>
+                        <div style="margin-top: 10px; display: flex; gap: 20px;">
+                            <div><strong>Total de Oportunidades:</strong> ${analise.total_oportunidades}</div>
+                            <div><strong>Promissoras:</strong> ${analise.oportunidades_positivas} (${analise.percentual_positivas}%)</div>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- Preços do Governo -->
+                    <h3 style="margin: 20px 0 10px 0;"><i class="fas fa-gavel"></i> Preços Praticados pelo Governo</h3>
+                    ${precosGov && precosGov.total_registros > 0 ? `
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+                            <div style="flex: 1; padding: 12px; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 0.75rem; color: #666;">Preço Médio</div>
+                                <div style="font-size: 1.3rem; font-weight: bold; color: #1351b4;">
+                                    ${utils.formatarValor(precosGov.estatisticas.preco_medio)}
+                                </div>
+                            </div>
+                            <div style="flex: 1; padding: 12px; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 0.75rem; color: #666;">Preço Mínimo</div>
+                                <div style="font-size: 1.3rem; font-weight: bold; color: #28a745;">
+                                    ${utils.formatarValor(precosGov.estatisticas.preco_minimo)}
+                                </div>
+                            </div>
+                            <div style="flex: 1; padding: 12px; background: #f8f9fa; border-radius: 4px;">
+                                <div style="font-size: 0.75rem; color: #666;">Registros</div>
+                                <div style="font-size: 1.3rem; font-weight: bold;">
+                                    ${precosGov.total_registros}
+                                </div>
+                            </div>
+                        </div>
+                    ` : '<p>Nenhum preço do governo encontrado para este produto.</p>'}
+
+                    <!-- Oportunidades -->
+                    ${oportunidades && oportunidades.total > 0 ? `
+                        <h3 style="margin: 20px 0 10px 0;"><i class="fas fa-star"></i> Melhores Oportunidades (Top ${oportunidades.itens.length})</h3>
+                        <div style="display: grid; gap: 12px;">
+                            ${oportunidades.itens.slice(0, 5).map(op => `
+                                <div style="border: 1px solid ${
+                                    op.analise.classificacao === 'EXCELENTE' ? '#28a745' :
+                                    op.analise.classificacao === 'MUITO_BOA' ? '#17a2b8' :
+                                    op.analise.classificacao === 'BOA' ? '#007bff' : '#6c757d'
+                                }; border-radius: 8px; padding: 15px; background: white;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                                        <div style="flex: 1;">
+                                            <h4 style="margin: 0; font-size: 0.95rem;">${op.produto_mercado.titulo}</h4>
+                                            <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #666;">Fonte: ${op.produto_mercado.fonte}</p>
+                                        </div>
+                                        <div style="background: ${
+                                            op.analise.classificacao === 'EXCELENTE' ? '#28a745' :
+                                            op.analise.classificacao === 'MUITO_BOA' ? '#17a2b8' :
+                                            op.analise.classificacao === 'BOA' ? '#007bff' : '#6c757d'
+                                        }; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold;">
+                                            ${op.analise.classificacao}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 20px; align-items: center;">
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #666;">Preço Mercado</div>
+                                            <div style="font-size: 1.2rem; font-weight: bold; color: #00a650;">
+                                                ${utils.formatarValor(op.produto_mercado.preco)}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #666;">Margem vs Governo</div>
+                                            <div style="font-size: 1.1rem; font-weight: bold; color: #28a745;">
+                                                ${utils.formatarValor(op.comparacao.margem_vs_medio.reais)} (${op.comparacao.margem_vs_medio.percentual.toFixed(1)}%)
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 0.75rem; color: #666;">Score</div>
+                                            <div style="font-size: 1.1rem; font-weight: bold;">
+                                                ${op.analise.score.toFixed(0)}/100
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e5e5e5; font-size: 0.85rem;">
+                                        ${op.analise.recomendacao}
+                                    </div>
+                                    ${op.produto_mercado.url ? `
+                                        <a href="${op.produto_mercado.url}" target="_blank" class="btn btn-sm btn-success" style="margin-top: 10px; display: inline-flex; align-items: center; gap: 5px; text-decoration: none;">
+                                            <i class="fas fa-external-link-alt"></i> Ver Produto
+                                        </a>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p>Nenhuma oportunidade encontrada no momento.</p>'}
+                </div>
+            `;
+
+            modalConteudo.innerHTML = html;
+        }
+
+        function buscarLicitacoes(event) {
+            if (event) event.preventDefault();
+
+            filtrosAtuais = {
+                q: document.getElementById('filtroQ').value,
+                uf: document.getElementById('filtroUF').value,
+                municipio: document.getElementById('filtroMunicipio').value,
+                modalidade: document.getElementById('filtroModalidade').value,
+                situacao: document.getElementById('filtroSituacao').value,
+                dataInicio: document.getElementById('filtroDataInicio').value,
+                dataFim: document.getElementById('filtroDataFim').value
+            };
+
+            paginaAtual = 1;
+            carregarLicitacoes();
+        }
+
+        function limparFiltros() {
+            document.getElementById('formFiltros').reset();
+            filtrosAtuais = {};
+            paginaAtual = 1;
+            carregarLicitacoes();
+        }
+
+        function irParaPagina(pagina) {
+            paginaAtual = pagina;
+            carregarLicitacoes();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function initSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggle = document.getElementById('sidebarToggle');
+            const mobileToggle = document.getElementById('mobileMenuToggle');
+
+            if (toggle) {
+                toggle.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+            }
+
+            if (mobileToggle) {
+                mobileToggle.addEventListener('click', () => {
+                    sidebar.classList.add('open');
+                });
+            }
+        }
+
+        function initLogout() {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (confirm('Deseja realmente sair?')) {
+                        await api.logout();
+                        localStorage.removeItem('session_id');
+                        window.location.href = '/frontend/login.html';
+                    }
+                });
+            }
+        }
+    </script>
+</body>
+</html>

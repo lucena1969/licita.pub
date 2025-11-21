@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligência de Preços - Licita.pub</title>
+    <meta name="description" content="Compare preços do governo com o mercado e descubra oportunidades de negócio.">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/inteligencia-precos.css">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-gavel"></i>
+                    <span>Licita.pub</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" aria-label="Fechar menu" title="Fechar menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">Menu Principal</div>
+                    <ul class="nav-list">
+                        <li><a href="/frontend/app.html" class="nav-item"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
+                        <li><a href="/frontend/consultas.html" class="nav-item"><i class="fas fa-file-contract"></i><span>Licitações</span></a></li>
+                        <li><a href="/frontend/inteligencia-precos.html" class="nav-item active"><i class="fas fa-chart-line"></i><span>Inteligência de Preços</span></a></li>
+                    </ul>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">Minha Conta</div>
+                    <ul class="nav-list">
+                        <li><a href="#" class="nav-item" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Sair</span></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="content-header">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menu" title="Abrir menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title"><i class="fas fa-chart-line"></i> Inteligência de Preços</h1>
+                <div class="user-info"><i class="fas fa-user-circle"></i><span id="userName">Usuário</span></div>
+            </header>
+
+            <div class="content-body">
+                <div class="hero-section">
+                    <h1>💰 Descubra Oportunidades de Negócio</h1>
+                    <p>Compare preços do governo com o mercado e identifique produtos lucrativos para fornecer</p>
+                </div>
+
+                <!-- Banner OAuth -->
+                <div id="oauth-banner" class="alert alert-info" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Para comparar com preços do Mercado Livre, você precisa autorizar o acesso.</span>
+                    <a href="/backend/public/api/oauth/mercadolivre/authorize.php" class="btn-acao btn-ata" style="margin-left: 15px;">
+                        <i class="fab fa-google"></i> Autorizar Mercado Livre
+                    </a>
+                </div>
+
+                <div class="search-container">
+                    <form id="form-busca">
+                        <div class="search-box">
+                            <input type="text" id="busca" class="search-input" placeholder="O que você quer fornecer? Ex: notebook, papel a4, mouse..." required minlength="3">
+                            <button type="submit" class="search-btn" id="btn-buscar"><i class="fas fa-search"></i> Buscar Oportunidades</button>
+                        </div>
+                        <div class="filters-row">
+                            <div class="filter-group">
+                                <label class="filter-label" for="uf">Estado (UF)</label>
+                                <select id="uf" class="filter-select">
+                                    <option value="">Todos</option>
+                                    <option value="SP">São Paulo</option>
+                                    <option value="RJ">Rio de Janeiro</option>
+                                    <option value="MG">Minas Gerais</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label" for="vigente">Apenas ATAs vigentes</label>
+                                <select id="vigente" class="filter-select">
+                                    <option value="SIM" selected>Sim</option>
+                                    <option value="NAO">Não</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="resultados-container">
+                    <div class="empty-state">
+                        <i class="fas fa-search-dollar"></i>
+                        <h3>Comece sua busca</h3>
+                        <p>Digite um produto acima para descobrir oportunidades de fornecimento ao governo</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/utils.js?v=20251107b"></script>
+    <script src="js/api.js?v=20251107b"></script>
+    <script src="js/inteligencia-precos-v4.js?v=20251107b"></script>
+</body>
+</html>

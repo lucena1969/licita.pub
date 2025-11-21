@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Licita.pub</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            background: #1e1e1e;
+            color: #00ff00;
+        }
+        .section {
+            background: #2d2d2d;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #00ff00;
+        }
+        button {
+            background: #00ff00;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #00cc00;
+        }
+        .error { color: #ff0000; }
+        .success { color: #00ff00; }
+        .info { color: #00ccff; }
+        pre {
+            background: #000;
+            padding: 10px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 DEBUG - Licita.pub</h1>
+
+    <div class="section">
+        <h2>1. Verificar LocalStorage</h2>
+        <button onclick="checkLocalStorage()">Verificar</button>
+        <pre id="localStorage-result"></pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Verificar Cookies</h2>
+        <button onclick="checkCookies()">Verificar</button>
+        <pre id="cookies-result"></pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Testar API /auth/me.php</h2>
+        <button onclick="testAuthMe()">Testar</button>
+        <pre id="auth-me-result"></pre>
+    </div>
+
+    <div class="section">
+        <h2>4. Testar Carregamento de Arquivos</h2>
+        <button onclick="testFiles()">Testar</button>
+        <pre id="files-result"></pre>
+    </div>
+
+    <div class="section">
+        <h2>5. Simular Login</h2>
+        <input type="email" id="debug-email" placeholder="Email" value="" style="padding: 8px; width: 250px;">
+        <input type="password" id="debug-senha" placeholder="Senha" value="" style="padding: 8px; width: 250px;">
+        <button onclick="testLogin()">Login</button>
+        <pre id="login-result"></pre>
+    </div>
+
+    <div class="section">
+        <h2>6. Verificar app.js</h2>
+        <button onclick="testAppJS()">Verificar</button>
+        <pre id="appjs-result"></pre>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        // 1. Verificar LocalStorage
+        function checkLocalStorage() {
+            const result = document.getElementById('localStorage-result');
+            const sessionId = localStorage.getItem('session_id');
+
+            if (sessionId) {
+                result.innerHTML = `<span class="success">✓ Session ID encontrado:</span>\n${sessionId}`;
+            } else {
+                result.innerHTML = `<span class="error">✗ Session ID NÃO encontrado no localStorage</span>`;
+            }
+        }
+
+        // 2. Verificar Cookies
+        function checkCookies() {
+            const result = document.getElementById('cookies-result');
+            const cookies = document.cookie;
+
+            if (cookies) {
+                result.innerHTML = `<span class="success">✓ Cookies encontrados:</span>\n${cookies}`;
+            } else {
+                result.innerHTML = `<span class="error">✗ Nenhum cookie encontrado</span>`;
+            }
+        }
+
+        // 3. Testar API /auth/me.php
+        async function testAuthMe() {
+            const result = document.getElementById('auth-me-result');
+            result.innerHTML = '<span class="info">⏳ Testando...</span>';
+
+            try {
+                const sessionId = localStorage.getItem('session_id');
+
+                const response = await fetch('https://licita.pub/backend/api/auth/me.php', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': sessionId ? `Bearer ${sessionId}` : ''
+                    }
+                });
+
+                const data = await response.json();
+
+                result.innerHTML = `
+<span class="info">Status HTTP:</span> ${response.status} ${response.ok ? '✓' : '✗'}
+<span class="info">Headers:</span>
+${JSON.stringify({
+    'content-type': response.headers.get('content-type'),
+    'set-cookie': response.headers.get('set-cookie')
+}, null, 2)}
+
+<span class="info">Response Body:</span>
+${JSON.stringify(data, null, 2)}
+                `;
+
+                if (data.success) {
+                    result.innerHTML += '\n<span class="success">✓ API retornou sucesso!</span>';
+                } else {
+                    result.innerHTML += '\n<span class="error">✗ API retornou erro!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Erro ao conectar:\n${error.message}</span>`;
+            }
+        }
+
+        // 4. Testar carregamento de arquivos
+        async function testFiles() {
+            const result = document.getElementById('files-result');
+            result.innerHTML = '<span class="info">⏳ Testando...</span>';
+
+            const files = [
+                '/frontend/app.html',
+                '/frontend/css/layout.css',
+                '/frontend/css/components.css',
+                '/frontend/js/router.js',
+                '/frontend/js/app.js',
+                '/frontend/js/modules/licitacoes.js'
+            ];
+
+            let output = '';
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(`https://licita.pub${file}`);
+                    const status = response.status;
+                    const ok = response.ok;
+
+                    output += `${ok ? '✓' : '✗'} ${file} - ${status}\n`;
+                } catch (error) {
+                    output += `✗ ${file} - ERRO: ${error.message}\n`;
+                }
+            }
+
+            result.innerHTML = output;
+        }
+
+        // 5. Simular Login
+        async function testLogin() {
+            const result = document.getElementById('login-result');
+            const email = document.getElementById('debug-email').value;
+            const senha = document.getElementById('debug-senha').value;
+
+            if (!email || !senha) {
+                result.innerHTML = '<span class="error">✗ Preencha email e senha</span>';
+                return;
+            }
+
+            result.innerHTML = '<span class="info">⏳ Fazendo login...</span>';
+
+            try {
+                const response = await fetch('https://licita.pub/backend/api/auth/login.php', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, senha })
+                });
+
+                const data = await response.json();
+
+                result.innerHTML = `
+<span class="info">Status HTTP:</span> ${response.status}
+
+<span class="info">Response:</span>
+${JSON.stringify(data, null, 2)}
+                `;
+
+                if (data.success && data.session_id) {
+                    localStorage.setItem('session_id', data.session_id);
+                    result.innerHTML += '\n<span class="success">✓ Login OK! Session ID salvo no localStorage</span>';
+                } else {
+                    result.innerHTML += '\n<span class="error">✗ Login falhou!</span>';
+                }
+            } catch (error) {
+                result.innerHTML = `<span class="error">✗ Erro: ${error.message}</span>`;
+            }
+        }
+
+        // 6. Verificar se app.js carrega
+        function testAppJS() {
+            const result = document.getElementById('appjs-result');
+
+            let output = '';
+
+            // Verificar se api existe
+            if (typeof api !== 'undefined') {
+                output += '<span class="success">✓ API object existe</span>\n';
+                output += `  - get: ${typeof api.get}\n`;
+                output += `  - post: ${typeof api.post}\n`;
+                output += `  - me: ${typeof api.me}\n`;
+                output += `  - login: ${typeof api.login}\n`;
+            } else {
+                output += '<span class="error">✗ API object NÃO existe</span>\n';
+            }
+
+            // Verificar funções globais de app.js
+            output += '\n<span class="info">Funções globais do app.js:</span>\n';
+            output += `  - checkAuth: ${typeof checkAuth !== 'undefined' ? '✓' : '✗'}\n`;
+            output += `  - currentUser: ${typeof currentUser !== 'undefined' ? '✓' : '✗'}\n`;
+
+            result.innerHTML = output;
+        }
+
+        // Auto-executar verificações básicas
+        window.addEventListener('DOMContentLoaded', () => {
+            checkLocalStorage();
+            checkCookies();
+        });
+    </script>
+</body>
+</html>
